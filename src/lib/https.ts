@@ -132,7 +132,7 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
             // clientSessionToken.value = (payload as LoginResType).data.token;
             // clientSessionToken.expiresAt = (payload as LoginResType).data.expiresAt;
 
-        } else if (url === 'auth/logout') {
+        } else if (url === 'api/auth/logout') {
             localStorage.removeItem('accessToken')
             localStorage.removeItem('refreshToken')
             //  handle auth with cookies

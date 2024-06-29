@@ -26,6 +26,8 @@ export async function POST() {
             accessToken,
             refreshToken
         })
+        nextCookies.delete('accessToken')
+        nextCookies.delete('refreshToken')
         return Response.json({
             message: 'Logout thành công'
         }, {

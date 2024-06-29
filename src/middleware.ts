@@ -13,10 +13,10 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL(`/login/?returnUrl=${pathname}`, request.url))
     }
 
-    if (privatePath.some(path => path.startsWith(pathname)) && !accessToken){
+    if (privatePath.some(path => pathname.startsWith(path)) && !accessToken){
         return NextResponse.redirect(new URL(`/login/?returnUrl=${pathname}`, request.url))
     }
-    if (authPaths.some(path => path.startsWith(pathname)) && accessToken){
+    if (authPaths.some(path => pathname.startsWith(path)) && accessToken){
         return NextResponse.redirect(new URL('/manage/dashboard', request.url))
     }
     return NextResponse.next()

@@ -11,14 +11,18 @@ import { useMutation } from '@tanstack/react-query'
 import authAPI from '@/apiRequests/auth'
 import { toast } from "sonner"
 import { handleApiError } from '@/lib/utils'
+import { useRouter } from 'next/navigation'
 
 
 export default function LoginForm() {
+  const router = useRouter()
+
   const loginMutation = useMutation(
     {
       mutationFn: authAPI.loginClient,
       onSuccess: (data) => {
         toast.success(data.payload.message)
+        router.push('/manage/dashboard')
       },
       onError(error, variables, context) {
         handleApiError(error, form.setError)
@@ -67,7 +71,6 @@ export default function LoginForm() {
                         placeholder="m@example.com"
                         required
                         {...field}
-                        value={"admin@order.com"}
                       />
                       <FormMessage />
                     </div>

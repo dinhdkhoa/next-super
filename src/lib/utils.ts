@@ -26,3 +26,5 @@ export const handleApiError = (error: unknown, setError?: UseFormSetError<any>, 
     })
   }
 }
+
+export const isClient = typeof window !== 'undefined'

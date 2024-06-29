@@ -125,7 +125,7 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
     }
 
     if(isClient){
-        if (url === 'auth/login' || url === 'auth/register') {
+        if (url === 'api/auth/login' || url === 'auth/register') {
             localStorage.setItem('accessToken',(payload as LoginResType).data.accessToken)
             localStorage.setItem('refreshToken',(payload as LoginResType).data.refreshToken)
             //  handle auth with cookies

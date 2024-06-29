@@ -17,7 +17,7 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL(`/login/?returnUrl=${pathname}`, request.url))
     }
     if (authPaths.some(path => path.startsWith(pathname)) && accessToken){
-        return NextResponse.redirect(new URL('/me', request.url))
+        return NextResponse.redirect(new URL('/manage/dashboard', request.url))
     }
     return NextResponse.next()
 }

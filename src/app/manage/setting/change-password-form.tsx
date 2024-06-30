@@ -8,8 +8,16 @@ import { useForm } from 'react-hook-form'
 import { ChangePasswordBody, ChangePasswordBodyType } from '@/schemaValidations/account.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import { useMutation } from '@tanstack/react-query'
+import accountAPI from '@/apiRequests/account'
+import { handleApiError } from '@/lib/utils'
+import { toast } from 'sonner'
+import { FormEvent } from 'react'
 
 export default function ChangePasswordForm() {
+  const changePass = useMutation(
+    {mutationFn: accountAPI.changePW}
+  )
   const form = useForm<ChangePasswordBodyType>({
     resolver: zodResolver(ChangePasswordBody),
     defaultValues: {
@@ -19,24 +27,76 @@ export default function ChangePasswordForm() {
     }
   })
 
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (changePass.isPending) return
+    try {
+      const changePWRes = await changePass.mutateAsync(form.getValues())
+      toast.success(changePWRes.payload.message)
+    
+      form.reset()
+    } catch (error) {
+      handleApiError(error, form.setError)
+    }
+  }
+
+  const handleDelete = () => {
+    const promise = () =>
+      new Promise((resolve, reject) =>
+        setTimeout(() => reject({ name: "Sonner" }), 2000)
+      )
+
+    toast.promise(promise, {
+      loading: "Deleting...",
+      position: "top-center",
+      success: (data) => {
+        return `Alo toast has been added`
+      },
+      error: "Error"
+    })
+  }
+
+  const confirm = () => {
+    toast(" Delete Data", {
+      description: "Are you sure you want to delete",
+      action: {
+        label: "Delete",
+        onClick: () => handleDelete()
+      },
+      position: "top-center"
+    })
+  }
+
   return (
     <Form {...form}>
-      <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8'>
-        <Card className='overflow-hidden' x-chunk='dashboard-07-chunk-4'>
+      <form
+        noValidate
+        className="grid auto-rows-max items-start gap-4 md:gap-8"
+        onSubmit={handleSubmit}
+        // onReset={e => {form.reset()}}
+        onReset={e => {      toast.success('changePWRes.payload.message')
+}}
+      >
+        <Card className="overflow-hidden" x-chunk="dashboard-07-chunk-4">
           <CardHeader>
             <CardTitle>Đổi mật khẩu</CardTitle>
             {/* <CardDescription>Lipsum dolor sit amet, consectetur adipiscing elit</CardDescription> */}
           </CardHeader>
           <CardContent>
-            <div className='grid gap-6'>
+            <div className="grid gap-6">
               <FormField
                 control={form.control}
-                name='oldPassword'
+                name="oldPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <div className='grid gap-3'>
-                      <Label htmlFor='oldPassword'>Mật khẩu cũ</Label>
-                      <Input id='oldPassword' type='password' className='w-full' {...field} />
+                    <div className="grid gap-3">
+                      <Label htmlFor="oldPassword">Mật khẩu cũ</Label>
+                      <Input
+                        id="oldPassword"
+                        type="password"
+                        className="w-full"
+                        {...field}
+                      />
                       <FormMessage />
                     </div>
                   </FormItem>
@@ -44,12 +104,17 @@ export default function ChangePasswordForm() {
               />
               <FormField
                 control={form.control}
-                name='password'
+                name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <div className='grid gap-3'>
-                      <Label htmlFor='password'>Mật khẩu mới</Label>
-                      <Input id='password' type='password' className='w-full' {...field} />
+                    <div className="grid gap-3">
+                      <Label htmlFor="password">Mật khẩu mới</Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        className="w-full"
+                        {...field}
+                      />
                       <FormMessage />
                     </div>
                   </FormItem>
@@ -57,22 +122,32 @@ export default function ChangePasswordForm() {
               />
               <FormField
                 control={form.control}
-                name='confirmPassword'
+                name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <div className='grid gap-3'>
-                      <Label htmlFor='confirmPassword'>Nhập lại mật khẩu mới</Label>
-                      <Input id='confirmPassword' type='password' className='w-full' {...field} />
+                    <div className="grid gap-3">
+                      <Label htmlFor="confirmPassword">
+                        Nhập lại mật khẩu mới
+                      </Label>
+                      <Input
+                        id="confirmPassword"
+                        type="password"
+                        className="w-full"
+                        {...field}
+                      />
                       <FormMessage />
                     </div>
                   </FormItem>
                 )}
               />
-              <div className=' items-center gap-2 md:ml-auto flex'>
-                <Button variant='outline' size='sm'>
+              <div className=" items-center gap-2 md:ml-auto flex">
+                <Button variant="outline" size="sm" type='reset'>
                   Hủy
                 </Button>
-                <Button size='sm'>Lưu thông tin</Button>
+                <Button variant="outline" size="sm" onClick={confirm}>
+                  Toast
+                </Button>
+                <Button size="sm">Lưu thông tin</Button>
               </div>
             </div>
           </CardContent>

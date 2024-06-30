@@ -15,14 +15,12 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import authAPI from '@/apiRequests/auth'
 import { handleApiError } from '@/lib/utils'
 import accountAPI from '@/apiRequests/account'
+import useGetAccount from '@/queries/useGetAccount'
 
 
 export default function DropdownAvatar() {
   const router = useRouter()
-  const {data } = useQuery({
-    queryKey: ['account-profile'],
-    queryFn: accountAPI.getAccount
-  })
+  const {data} = useGetAccount()
 
   const account = data?.payload.data
 

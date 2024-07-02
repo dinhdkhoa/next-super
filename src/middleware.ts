@@ -8,16 +8,21 @@ const authPaths = ['/login', '/register']
 export function middleware(request: NextRequest) {
     const {pathname} = request.nextUrl
     const accessToken = Boolean(request.cookies.get('accessToken'))
+    const refreshToken = Boolean(request.cookies.get('refreshToken'))
 
-    if ( (pathname.includes('/edit') || pathname.includes('/add')) && !accessToken){
+    if (privatePath.some(path => pathname.startsWith(path)) && !accessToken && !refreshToken) {
         return NextResponse.redirect(new URL(`/login/?returnUrl=${pathname}`, request.url))
     }
 
-    if (privatePath.some(path => pathname.startsWith(path)) && !accessToken){
-        return NextResponse.redirect(new URL(`/login/?returnUrl=${pathname}`, request.url))
-    }
-    if (authPaths.some(path => pathname.startsWith(path)) && accessToken){
+    if (authPaths.some(path => pathname.startsWith(path)) && accessToken && refreshToken) {
         return NextResponse.redirect(new URL('/manage/dashboard', request.url))
+    }
+
+    
+    if (privatePath.some(path => pathname.startsWith(path)) && !accessToken && refreshToken ){
+        const redirectUrl = new URL('/logout', request.url)
+        redirectUrl.searchParams.set('rt', request.cookies.get('refreshToken')?.value || '')
+        return NextResponse.redirect(redirectUrl)
     }
     return NextResponse.next()
 }

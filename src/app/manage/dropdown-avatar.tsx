@@ -16,6 +16,7 @@ import authAPI from '@/apiRequests/auth'
 import { handleApiError } from '@/lib/utils'
 import accountAPI from '@/apiRequests/account'
 import useGetAccount from '@/queries/useGetAccount'
+import useLogout from '@/queries/useLogout'
 
 
 export default function DropdownAvatar() {
@@ -24,16 +25,17 @@ export default function DropdownAvatar() {
 
   const account = data?.payload.data
 
-  const logoutMutation = useMutation({
-    mutationFn: authAPI.logoutClient
-  })
+  const logoutMutation = useLogout()
 
   const handleLogout = async () => {
     if(logoutMutation.isPending) return 
 
     try {
-      await logoutMutation.mutateAsync()
-      router.push('/login')
+      await logoutMutation.mutate(null as any, {
+        onSuccess(data, variables, context) {
+           router.push("/login")
+        },
+      })
     } catch (error) {
       handleApiError(error)
     }

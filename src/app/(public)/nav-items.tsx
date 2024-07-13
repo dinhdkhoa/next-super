@@ -1,5 +1,6 @@
 'use client'
 
+import { useAppContext } from '@/components/app-provider'
 import StorageService from '@/lib/storage'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -26,11 +27,7 @@ const menuItems = [
 ]
 
 export default function NavItems({ className }: { className?: string }) {
-  const [isSignedIn, setIsSignedIn] = useState(false)
-
-  useEffect(() => {
-    setIsSignedIn(Boolean(StorageService.getAccessToken()))
-  }, [])
+  const {isAuth : isSignedIn} = useAppContext()
 
   return menuItems.map((item) => {
     if (

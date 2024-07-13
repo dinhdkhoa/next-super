@@ -1,4 +1,5 @@
 "use client"
+import { useAppContext } from '@/components/app-provider'
 import StorageService from '@/lib/storage'
 import { checkAndRefreshToken } from '@/lib/utils'
 import { useSearchParams } from 'next/navigation'
@@ -10,6 +11,8 @@ export default function RefreshToken() {
      const params = useSearchParams()
   const refreshToken = params.get("rt")
   const returnUrl = params.get("returnUrl")
+  const {setIsAuth} = useAppContext()
+
 
   useEffect(() => {
     if (
@@ -17,6 +20,7 @@ export default function RefreshToken() {
       refreshToken !== StorageService.getRefreshToken()
     ) {
         router.push("/login")
+        setIsAuth(false)
     } else {
         checkAndRefreshToken(() => {
             router.push(returnUrl || '/manage/setting')

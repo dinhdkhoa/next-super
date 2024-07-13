@@ -11,18 +11,31 @@ import { useMutation } from '@tanstack/react-query'
 import authAPI from '@/apiRequests/auth'
 import { toast } from "sonner"
 import { handleApiError } from '@/lib/utils'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { useAppContext } from '@/components/app-provider'
+import { useEffect } from 'react'
 
 
 export default function LoginForm() {
   const router = useRouter()
+  const params = useSearchParams()
+  const refreshToken = params.get("rt")
+  const returnUrl = params.get("returnUrl")
+  const {setIsAuth} = useAppContext()
+
+  useEffect(() => {
+    if(refreshToken == 'expired'){
+      setIsAuth(false)
+    }
+  }, [refreshToken, setIsAuth])
 
   const loginMutation = useMutation(
     {
       mutationFn: authAPI.loginClient,
       onSuccess: (data) => {
         toast.success(data.payload.message)
-        router.push('/manage/dashboard')
+        setIsAuth(true)
+        router.push(returnUrl ??'/manage/dashboard')
       },
       onError(error, variables, context) {
         handleApiError(error, form.setError)

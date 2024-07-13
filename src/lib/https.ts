@@ -117,7 +117,7 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
                 await handleUnthorizedResponseOnClient(baseHeader as any)
             } else {
                 const paramRefreshToken = (options?.headers as any)?.Authorization.split('Bearer ').pop() as string
-                redirect(`/logout?sessionToken=${paramRefreshToken}`)
+                redirect(`/logout?at=${paramRefreshToken}`)
             }
         } else {
             throw new HttpError(data)
@@ -125,7 +125,7 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
     }
 
     if(isClient){
-        if (url === 'api/auth/login' || url === 'auth/register') {
+        if (url === 'api/auth/login' || url === 'auth/register' || url === 'api/auth/refresh-token') {
             localStorage.setItem('accessToken',(payload as LoginResType).data.accessToken)
             localStorage.setItem('refreshToken',(payload as LoginResType).data.refreshToken)
             //  handle auth with cookies
@@ -133,6 +133,7 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
             // clientSessionToken.expiresAt = (payload as LoginResType).data.expiresAt;
 
         } else if (url === 'api/auth/logout') {
+            console.log('first')
             localStorage.removeItem('accessToken')
             localStorage.removeItem('refreshToken')
             //  handle auth with cookies

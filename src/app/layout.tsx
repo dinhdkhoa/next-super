@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils"
 import { Toaster } from "@/components/ui/sonner"
 import { ThemeProvider } from "@/components/theme-provider"
 import AppProvider from "@/components/app-provider"
+import RefreshToken from "@/components/refresh-token"
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -37,6 +38,7 @@ export default function RootLayout({
           >
             {children}
             <Toaster richColors />
+            <RefreshToken />
           </ThemeProvider>
         </AppProvider>
       </body>

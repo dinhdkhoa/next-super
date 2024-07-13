@@ -29,7 +29,7 @@ export default function NavItems({ className }: { className?: string }) {
   const [isSignedIn, setIsSignedIn] = useState(false)
 
   useEffect(() => {
-    setIsSignedIn(Boolean(StorageService.getAccessToken))
+    setIsSignedIn(Boolean(StorageService.getAccessToken()))
   }, [])
 
   return menuItems.map((item) => {

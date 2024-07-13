@@ -7,6 +7,10 @@ const StorageService = {
     setRefreshToken: (token: string) => {
         if (isClient) localStorage.setItem('refreshToken', token)
     },
+    removeTokens: () => {
+        localStorage.removeItem('accessToken')
+        localStorage.removeItem('refreshToken')
+    }
 }
 
 export default StorageService

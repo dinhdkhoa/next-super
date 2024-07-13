@@ -31,7 +31,7 @@ const authAPI = {
         const res = await this.refreshTokenReq
         this.refreshTokenReq = null
         return res
-    }
+    },
 }
 
 export default authAPI

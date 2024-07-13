@@ -20,8 +20,9 @@ export function middleware(request: NextRequest) {
 
     
     if (privatePath.some(path => pathname.startsWith(path)) && !accessToken && refreshToken ){
-        const redirectUrl = new URL('/logout', request.url)
+        const redirectUrl = new URL('/refresh-token', request.url)
         redirectUrl.searchParams.set('rt', request.cookies.get('refreshToken')?.value || '')
+        redirectUrl.searchParams.set('returnUrl',pathname)
         return NextResponse.redirect(redirectUrl)
     }
     return NextResponse.next()

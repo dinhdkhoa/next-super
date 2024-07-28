@@ -43,9 +43,9 @@ export async function checkAndRefreshToken(onSuccess?: () => void, onError?: () 
   const decodedAT = accessToken ? jwt.decode(accessToken) as { exp: number, iat: number } : { exp: 0, iat: 0 }
   const decodedRT = jwt.decode(refreshToken) as { exp: number }
 
-  const now = Math.round(new Date().getTime() / 1000) // get epoch time in ms
+  const now = new Date().getTime() / 1000 // get epoch time in ms
 
-  if (decodedRT.exp <= now){
+  if (decodedRT.exp <= now - 1 ){ // bc expires in cookies is diffreent from ls for uknown reasons
     StorageService.removeTokens()
     return
   }

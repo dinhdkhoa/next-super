@@ -33,7 +33,7 @@ export default function UpdateProfileForm() {
     resolver: zodResolver(UpdateMeBody),
     defaultValues: {
       name:  "",
-      avatar:  ""
+      avatar:  undefined
     }
   })
 
@@ -66,7 +66,7 @@ export default function UpdateProfileForm() {
     }
     form.reset({
       name: user?.name ?? "",
-      avatar: user?.avatar ?? ""
+      avatar: user?.avatar ?? undefined
     })
   }
 
@@ -74,7 +74,7 @@ export default function UpdateProfileForm() {
   useEffect(() => {
     if (user) {
       form.setValue("name", user.name ?? "")
-      form.setValue("avatar", user.avatar ?? "")
+      form.setValue("avatar", user.avatar ?? undefined)
     }
   }, [form, user])
 

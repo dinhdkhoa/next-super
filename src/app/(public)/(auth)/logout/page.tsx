@@ -2,9 +2,9 @@
 import StorageService from "@/lib/storage"
 import useLogout from "@/queries/useLogout"
 import { useRouter, useSearchParams } from "next/navigation"
-import React, { useEffect, useState } from "react"
+import React, { Suspense, useEffect, useState } from "react"
 
-export default function Logout() {
+const LogoutComponent = () => {
   const { mutateAsync } = useLogout()
   const router = useRouter()
   const params = useSearchParams()
@@ -35,4 +35,10 @@ export default function Logout() {
   }, [])
 
   return <div>Token Expires, Redirecting ...</div>
+}
+
+export default function Logout() {
+  return <Suspense>
+    <LogoutComponent />
+  </Suspense>
 }

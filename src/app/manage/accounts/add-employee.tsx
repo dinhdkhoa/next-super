@@ -9,20 +9,32 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@/components/ui/dialog'
+import mediaAPI from '@/apiRequests/media'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { CreateEmployeeAccountBody, CreateEmployeeAccountBodyType } from '@/schemaValidations/account.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusCircle, Upload } from 'lucide-react'
-import { useMemo, useRef, useState } from 'react'
+import { FormEvent, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { handleApiError } from '@/lib/utils'
+import { toast } from 'sonner'
+import { useMutation } from '@tanstack/react-query'
+import accountAPI from '@/apiRequests/account'
+
 
 export default function AddEmployee() {
   const [file, setFile] = useState<File | null>(null)
   const [open, setOpen] = useState(false)
   const avatarInputRef = useRef<HTMLInputElement | null>(null)
+  const uploadProfileImg = useMutation({
+    mutationFn: mediaAPI.upload
+  })
+  const addEmployeeMutation = useMutation({
+    mutationFn: accountAPI.addEmployee
+  })
   const form = useForm<CreateEmployeeAccountBodyType>({
     resolver: zodResolver(CreateEmployeeAccountBody),
     defaultValues: {
@@ -42,6 +54,33 @@ export default function AddEmployee() {
     return avatar
   }, [file, avatar])
 
+  const handleSubmit =
+    async (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault()
+      if (uploadProfileImg.isPending || addEmployeeMutation.isPending) return
+      const body = form.getValues()
+      try {
+        if (file) {
+          const formData = new FormData()
+          formData.append("file", file)
+          const uploadDataRes = await uploadProfileImg.mutateAsync(formData)
+          const imgURL = uploadDataRes.payload.data
+          body.avatar = imgURL
+        }
+        const updateProfileRes = await addEmployeeMutation.mutateAsync(body)
+        toast.success(updateProfileRes.payload.message)
+        resetForm()
+        setOpen(false)
+      } catch (error) {
+        handleApiError(error, form.setError)
+      }
+    }
+
+  const resetForm = () => {
+    setFile(null)
+    form.reset()
+  }
+
   return (
     <Dialog onOpenChange={setOpen} open={open}>
       <DialogTrigger asChild>
@@ -56,7 +95,7 @@ export default function AddEmployee() {
           <DialogDescription>Các trường tên, email, mật khẩu là bắt buộc</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='add-employee-form'>
+          <form noValidate onSubmit={handleSubmit} className='grid auto-rows-max items-start gap-4 md:gap-8' id='add-employee-form'>
             <div className='grid gap-4 py-4'>
               <FormField
                 control={form.control}

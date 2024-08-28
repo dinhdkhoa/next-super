@@ -57,7 +57,7 @@ export default function UpdateProfileForm() {
         toast.success(updateProfileRes.payload.message)
         refetch()
       } catch (error) {
-        handleApiError(error)
+        handleApiError(error, form.setError)
       }
     }
   const resetForm = () => {

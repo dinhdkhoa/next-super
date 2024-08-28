@@ -43,6 +43,8 @@ import {
 } from '@/components/ui/alert-dialog'
 import { useSearchParams } from 'next/navigation'
 import AutoPagination from '@/components/auto-pagination'
+import { useQuery } from '@tanstack/react-query'
+import accountAPI from '@/apiRequests/account'
 
 type AccountItem = AccountListResType['data'][0]
 
@@ -165,7 +167,10 @@ export default function AccountTable() {
   // const params = Object.fromEntries(searchParam.entries())
   const [employeeIdEdit, setEmployeeIdEdit] = useState<number | undefined>()
   const [employeeDelete, setEmployeeDelete] = useState<AccountItem | null>(null)
-  const data: any[] = []
+  const dataQuery = useQuery({
+    queryKey: ["account-list"],
+    queryFn: accountAPI.getAccountList
+  })
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -174,6 +179,9 @@ export default function AccountTable() {
     pageIndex, // Gía trị mặc định ban đầu, không có ý nghĩa khi data được fetch bất đồng bộ
     pageSize: PAGE_SIZE //default page size
   })
+
+  const data = dataQuery.data?.payload.data ?? []
+
 
   const table = useReactTable({
     data,

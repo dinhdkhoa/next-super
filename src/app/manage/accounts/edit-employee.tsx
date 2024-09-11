@@ -10,24 +10,40 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { UpdateEmployeeAccountBody, UpdateEmployeeAccountBodyType } from '@/schemaValidations/account.schema'
+import { AccountResType, UpdateEmployeeAccountBody, UpdateEmployeeAccountBodyType } from '@/schemaValidations/account.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Upload } from 'lucide-react'
-import { useMemo, useRef, useState } from 'react'
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Switch } from '@/components/ui/switch'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import accountAPI from '@/apiRequests/account'
+import mediaAPI from '@/apiRequests/media'
+import { toast } from 'sonner'
+import { handleApiError } from '@/lib/utils'
 
 export default function EditEmployee({
   id,
   setId,
   onSubmitSuccess
 }: {
-  id?: number | undefined
+  id?: number
   setId: (value: number | undefined) => void
   onSubmitSuccess?: () => void
 }) {
+  const { data } = useQuery({
+    queryKey: ['getEmployeeDetail', id],
+    queryFn: () => accountAPI.getEmployeeDetail(id as number),
+    enabled: Boolean(id)
+  })
+  const uploadProfileImg = useMutation({
+    mutationFn: mediaAPI.upload
+  })
+  const updateEmployeeMutation = useMutation({
+    mutationFn: accountAPI.updateEmployee,
+  })
   const [file, setFile] = useState<File | null>(null)
   const avatarInputRef = useRef<HTMLInputElement | null>(null)
   const form = useForm<UpdateEmployeeAccountBodyType>({
@@ -51,6 +67,42 @@ export default function EditEmployee({
     return avatar
   }, [file, avatar])
 
+  useEffect(() => {
+    if(data){
+      const { avatar, name , email} = data.payload.data
+      form.reset({
+        avatar: avatar ?? form.getValues('avatar'),
+        name,
+        email,
+        password: form.getValues('password'),
+        confirmPassword: form.getValues('confirmPassword'),
+        changePassword: form.getValues('changePassword'),
+      })
+    }
+  }, [data, form])
+
+  const handleSubmit =
+    async (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault()
+      if (uploadProfileImg.isPending || updateEmployeeMutation.isPending) return
+      const body = form.getValues()
+      try {
+        if (file) {
+          const formData = new FormData()
+          formData.append("file", file)
+          const uploadDataRes = await uploadProfileImg.mutateAsync(formData)
+          const imgURL = uploadDataRes.payload.data
+          body.avatar = imgURL
+        }
+        const updateProfileRes = await updateEmployeeMutation.mutateAsync({id, ...body})
+        toast.success(updateProfileRes.payload.message)
+        onSubmitSuccess && onSubmitSuccess()
+        setId(undefined)
+      } catch (error) {
+        handleApiError(error, form.setError)
+      }
+    }
+
   return (
     <Dialog
       open={Boolean(id)}
@@ -66,7 +118,7 @@ export default function EditEmployee({
           <DialogDescription>Các trường tên, email, mật khẩu là bắt buộc</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='edit-employee-form'>
+          <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='edit-employee-form' onSubmit={handleSubmit}>
             <div className='grid gap-4 py-4'>
               <FormField
                 control={form.control}

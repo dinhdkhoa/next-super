@@ -75,7 +75,7 @@ export const UpdateEmployeeAccountBody = z
     }
   })
 
-export type UpdateEmployeeAccountBodyType = z.TypeOf<typeof UpdateEmployeeAccountBody>
+export type UpdateEmployeeAccountBodyType = z.TypeOf<typeof UpdateEmployeeAccountBody> & {id?: number}
 
 export const UpdateMeBody = z
   .object({

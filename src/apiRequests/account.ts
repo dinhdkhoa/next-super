@@ -1,5 +1,5 @@
 import http from "@/lib/https";
-import { AccountListResType, AccountResType, ChangePasswordBodyType, CreateEmployeeAccountBodyType, UpdateMeBodyType } from "@/schemaValidations/account.schema";
+import { AccountListResType, AccountResType, ChangePasswordBodyType, CreateEmployeeAccountBodyType, UpdateEmployeeAccountBodyType, UpdateMeBodyType } from "@/schemaValidations/account.schema";
 import { LoginBodyType, LoginResType } from "@/schemaValidations/auth.schema";
 
 const accountAPI = {
@@ -7,7 +7,9 @@ const accountAPI = {
     updateAccount: (body: UpdateMeBodyType) => http.put<AccountResType>('accounts/me',body),
     changePW: (body: ChangePasswordBodyType) => http.put<AccountResType>('accounts/change-password', body),
     addEmployee: (body: CreateEmployeeAccountBodyType) => http.post<AccountResType>('accounts', body),
-    getAccountList: () => http.get<AccountListResType>('accounts')
+    getAccountList: () => http.get<AccountListResType>('accounts'),
+    updateEmployee: ({id, ...body} : UpdateEmployeeAccountBodyType) => http.put<AccountResType>(`accounts/detail/${id}`, body),
+    getEmployeeDetail: (id: number) => http.get<AccountResType>(`accounts/detail/${id}`)
 }
 
 

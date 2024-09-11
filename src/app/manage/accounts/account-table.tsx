@@ -43,7 +43,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { useSearchParams } from 'next/navigation'
 import AutoPagination from '@/components/auto-pagination'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import accountAPI from '@/apiRequests/account'
 
 type AccountItem = AccountListResType['data'][0]
@@ -182,6 +182,9 @@ export default function AccountTable() {
 
   const data = dataQuery.data?.payload.data ?? []
 
+  const listRefetch = () => {
+    dataQuery.refetch()
+  }
 
   const table = useReactTable({
     data,
@@ -215,7 +218,7 @@ export default function AccountTable() {
   return (
     <AccountTableContext.Provider value={{ employeeIdEdit, setEmployeeIdEdit, employeeDelete, setEmployeeDelete }}>
       <div className='w-full'>
-        <EditEmployee id={employeeIdEdit} setId={setEmployeeIdEdit} onSubmitSuccess={() => {}} />
+        <EditEmployee id={employeeIdEdit} setId={setEmployeeIdEdit} onSubmitSuccess={listRefetch} />
         <AlertDialogDeleteAccount employeeDelete={employeeDelete} setEmployeeDelete={setEmployeeDelete} />
         <div className='flex items-center py-4'>
           <Input
@@ -225,7 +228,7 @@ export default function AccountTable() {
             className='max-w-sm'
           />
           <div className='ml-auto flex items-center gap-2'>
-            <AddEmployee />
+            <AddEmployee onSubmitSuccess={listRefetch} />
           </div>
         </div>
         <div className='rounded-md border'>

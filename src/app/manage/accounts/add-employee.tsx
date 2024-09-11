@@ -25,7 +25,11 @@ import { useMutation } from '@tanstack/react-query'
 import accountAPI from '@/apiRequests/account'
 
 
-export default function AddEmployee() {
+export default function AddEmployee({
+  onSubmitSuccess
+}: {
+  onSubmitSuccess?: () => void
+}) {
   const [file, setFile] = useState<File | null>(null)
   const [open, setOpen] = useState(false)
   const avatarInputRef = useRef<HTMLInputElement | null>(null)
@@ -70,6 +74,7 @@ export default function AddEmployee() {
         const updateProfileRes = await addEmployeeMutation.mutateAsync(body)
         toast.success(updateProfileRes.payload.message)
         resetForm()
+        onSubmitSuccess && onSubmitSuccess()
         setOpen(false)
       } catch (error) {
         handleApiError(error, form.setError)

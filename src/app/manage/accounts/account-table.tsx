@@ -43,8 +43,10 @@ import {
 } from '@/components/ui/alert-dialog'
 import { useSearchParams } from 'next/navigation'
 import AutoPagination from '@/components/auto-pagination'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import accountAPI from '@/apiRequests/account'
+import { toast } from 'sonner'
+import { handleApiError } from '@/lib/utils'
 
 type AccountItem = AccountListResType['data'][0]
 
@@ -128,11 +130,27 @@ export const columns: ColumnDef<AccountType>[] = [
 
 function AlertDialogDeleteAccount({
   employeeDelete,
-  setEmployeeDelete
+  setEmployeeDelete,
+  onDeleteSuccess
 }: {
   employeeDelete: AccountItem | null
   setEmployeeDelete: (value: AccountItem | null) => void
+  onDeleteSuccess?: () => void
 }) {
+  const deleteAccountMutation = useMutation({
+    mutationFn: accountAPI.deleteEmployeeDetail,
+    onSuccess: ((data) => {
+      toast.success(data.payload.message)
+      setEmployeeDelete(null)
+      onDeleteSuccess && onDeleteSuccess()
+    }), 
+    onError: ((error) => handleApiError(error))
+  })
+
+  const handleDelete = () => {
+    if(!employeeDelete) return
+    deleteAccountMutation.mutate(employeeDelete.id)
+  }
   return (
     <AlertDialog
       open={Boolean(employeeDelete)}
@@ -152,7 +170,7 @@ function AlertDialogDeleteAccount({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={handleDelete}>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -219,7 +237,7 @@ export default function AccountTable() {
     <AccountTableContext.Provider value={{ employeeIdEdit, setEmployeeIdEdit, employeeDelete, setEmployeeDelete }}>
       <div className='w-full'>
         <EditEmployee id={employeeIdEdit} setId={setEmployeeIdEdit} onSubmitSuccess={listRefetch} />
-        <AlertDialogDeleteAccount employeeDelete={employeeDelete} setEmployeeDelete={setEmployeeDelete} />
+        <AlertDialogDeleteAccount employeeDelete={employeeDelete} setEmployeeDelete={setEmployeeDelete} onDeleteSuccess={listRefetch} />
         <div className='flex items-center py-4'>
           <Input
             placeholder='Filter emails...'

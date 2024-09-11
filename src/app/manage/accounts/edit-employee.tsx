@@ -97,10 +97,15 @@ export default function EditEmployee({
         const updateProfileRes = await updateEmployeeMutation.mutateAsync({id, ...body})
         toast.success(updateProfileRes.payload.message)
         onSubmitSuccess && onSubmitSuccess()
-        setId(undefined)
+        resetStateOnFormClosed()
       } catch (error) {
         handleApiError(error, form.setError)
       }
+    }
+
+    const resetStateOnFormClosed = () => {
+      setId(undefined)
+      if(file) setFile(null)
     }
 
   return (
@@ -108,7 +113,7 @@ export default function EditEmployee({
       open={Boolean(id)}
       onOpenChange={(value) => {
         if (!value) {
-          setId(undefined)
+          resetStateOnFormClosed()
         }
       }}
     >

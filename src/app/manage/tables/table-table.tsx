@@ -1,5 +1,6 @@
 'use client'
 
+import { Button } from '@/components/ui/button'
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import {
   ColumnDef,
@@ -13,19 +14,11 @@ import {
   getSortedRowModel,
   useReactTable
 } from '@tanstack/react-table'
-import { Button } from '@/components/ui/button'
 
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
-import { Input } from '@/components/ui/input'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { createContext, useContext, useEffect, useState } from 'react'
+import AddTable from '@/app/manage/tables/add-table'
+import EditTable from '@/app/manage/tables/edit-table'
+import AutoPagination from '@/components/auto-pagination'
+import TableQRCode from '@/components/table-qrcode'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -36,15 +29,21 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { getVietnameseTableStatus } from '@/lib/utils'
-import { useSearchParams } from 'next/navigation'
-import AutoPagination from '@/components/auto-pagination'
 import { TableListResType } from '@/schemaValidations/table.schema'
-import EditTable from '@/app/manage/tables/edit-table'
-import AddTable from '@/app/manage/tables/add-table'
-import { useQuery } from '@tanstack/react-query'
-import tableAPI from '@/apiRequests/table'
-import TableQRCode from '@/components/table-qrcode'
+import { useSearchParams } from 'next/navigation'
+import { createContext, useContext, useEffect, useState } from 'react'
+import { useDeleteTable, useGetTableDetail } from './queries/useTableQueries'
 
 type TableItem = TableListResType['data'][0]
 
@@ -64,7 +63,11 @@ export const columns: ColumnDef<TableItem>[] = [
   {
     accessorKey: 'number',
     header: 'Số bàn',
-    cell: ({ row }) => <div className='capitalize'>{row.getValue('number')}</div>
+    cell: ({ row }) => <div className='capitalize'>{row.getValue('number')}</div>,
+    filterFn: (rows, columnId, filterValue) => {
+      if(!filterValue) return true
+      return String(filterValue) == String(rows.getValue('number'))
+    }
   },
   {
     accessorKey: 'capacity',
@@ -90,6 +93,7 @@ export const columns: ColumnDef<TableItem>[] = [
       const openEditTable = () => {
         setTableIdEdit(row.original.number)
       }
+
 
       const openDeleteTable = () => {
         setTableDelete(row.original)
@@ -121,6 +125,10 @@ function AlertDialogDeleteTable({
   tableDelete: TableItem | null
   setTableDelete: (value: TableItem | null) => void
 }) {
+
+  const mutateDelete = useDeleteTable()
+
+
   return (
     <AlertDialog
       open={Boolean(tableDelete)}
@@ -140,7 +148,7 @@ function AlertDialogDeleteTable({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={() => {mutateDelete.mutateAsync(tableDelete?.number || 0)}}>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -164,15 +172,8 @@ export default function TableTable() {
     pageSize: PAGE_SIZE //default page size
   })
 
-  const dataQuery = useQuery({
-    queryKey: ["table-list"],
-    queryFn: tableAPI.getTables
-  })
+  const dataQuery = useGetTableDetail()
   const data = dataQuery.data?.payload.data ?? []
-
-  const listRefetch = () => {
-    dataQuery.refetch()
-  }
 
   const table = useReactTable({
     data,

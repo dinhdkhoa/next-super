@@ -5,7 +5,7 @@ import {
   QueryClientProvider
 } from "@tanstack/react-query"
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react'
-// import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 
 
 const AppContext = createContext({
@@ -49,6 +49,7 @@ const queryClient = new QueryClient({
    <AppContext.Provider value={{isAuth,setIsAuth}}>
     <QueryClientProvider client={queryClient}>
       {children}
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
     </AppContext.Provider>
   )

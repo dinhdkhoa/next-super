@@ -27,7 +27,7 @@ function TableQRCode({ token, tableNumber, width = 250 }: { token: string; table
                 if (error) console.error(error)
                 canvasContext.drawImage(qrCanvas, 0, 0, width, width)
             })
-    }, [])
+    }, [tableNumber, token])
 
     return (
         <canvas

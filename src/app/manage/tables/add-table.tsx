@@ -5,15 +5,21 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PlusCircle } from 'lucide-react'
-import { useState } from 'react'
+import { FormEvent, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
-import { getVietnameseTableStatus } from '@/lib/utils'
+import { getVietnameseTableStatus, handleApiError } from '@/lib/utils'
 import { CreateTableBody, CreateTableBodyType } from '@/schemaValidations/table.schema'
 import { TableStatus, TableStatusValues } from '@/constants/type'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { toast } from 'sonner'
+import { useAddTableMutation } from './queries/useTableQueries'
 
-export default function AddTable() {
+export default function AddTable({
+  onSubmitSuccess
+}: {
+  onSubmitSuccess?: () => void
+}) {
   const [open, setOpen] = useState(false)
   const form = useForm<CreateTableBodyType>({
     resolver: zodResolver(CreateTableBody),
@@ -23,8 +29,34 @@ export default function AddTable() {
       status: TableStatus.Hidden
     }
   })
+
+  const addTable = useAddTableMutation()
+
+  const handleSubmit =
+  async (e: FormEvent<HTMLFormElement>) => {
+    try{
+      e.preventDefault()
+      const addTableRes = await addTable.mutateAsync(form.getValues())
+      toast.success(addTableRes.payload.message)
+      resetForm()
+      onSubmitSuccess && onSubmitSuccess()
+      setOpen(false)
+    } catch (error) {
+      handleApiError(error, form.setError)
+    }
+  }
+
+  const resetForm = () => {
+    form.reset()
+  }
+
+  const onOpenChange = (open: boolean) => {
+    setOpen(open)
+    if(!open) resetForm()
+  }
+
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
+    <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogTrigger asChild>
         <Button size='sm' className='h-7 gap-1'>
           <PlusCircle className='h-3.5 w-3.5' />
@@ -36,7 +68,7 @@ export default function AddTable() {
           <DialogTitle>Thêm bàn</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form noValidate className='grid auto-rows-max items-start gap-4 md:gap-8' id='add-table-form'>
+          <form noValidate onSubmit={handleSubmit} className='grid auto-rows-max items-start gap-4 md:gap-8' id='add-table-form'>
             <div className='grid gap-4 py-4'>
               <FormField
                 control={form.control}

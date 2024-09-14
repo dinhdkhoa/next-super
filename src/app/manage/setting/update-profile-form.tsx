@@ -11,7 +11,7 @@ import { handleApiError } from '@/lib/utils'
 import useGetAccount from '@/queries/useGetAccount'
 import { UpdateMeBody, UpdateMeBodyType } from '@/schemaValidations/account.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Upload } from 'lucide-react'
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -21,9 +21,13 @@ export default function UpdateProfileForm() {
   const [file, setFile] = useState<File | null>(null) 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
+  const queryClient = useQueryClient()
   const updateProfile = useMutation(
     {
-      mutationFn: accountAPI.updateAccount
+      mutationFn: accountAPI.updateAccount,
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['get-account-profile'] })
+      }
     }
   )
   const uploadProfileImg = useMutation({

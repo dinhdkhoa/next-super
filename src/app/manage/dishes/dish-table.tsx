@@ -43,6 +43,11 @@ import AutoPagination from '@/components/auto-pagination'
 import { DishListResType } from '@/schemaValidations/dish.schema'
 import EditDish from '@/app/manage/dishes/edit-dish'
 import AddDish from '@/app/manage/dishes/add-dish'
+import dishesAPI from '@/apiRequests/dishes'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import accountAPI from '@/apiRequests/account'
+import { toast } from 'sonner'
+import { handleApiError } from '@/lib/utils'
 
 type DishItem = DishListResType['data'][0]
 
@@ -131,11 +136,24 @@ export const columns: ColumnDef<DishItem>[] = [
 
 function AlertDialogDeleteDish({
   dishDelete,
-  setDishDelete
+  setDishDelete,
+  onDeleteSuccess
 }: {
   dishDelete: DishItem | null
   setDishDelete: (value: DishItem | null) => void
+  onDeleteSuccess: () => void
 }) {
+
+  const deleteAccountMutation = useMutation({
+    mutationFn: accountAPI.deleteEmployeeDetail,
+    onSuccess: ((data) => {
+      toast.success(data.payload.message)
+      setDishDelete(null)
+      onDeleteSuccess && onDeleteSuccess()
+    }), 
+    onError: ((error) => handleApiError(error))
+  })
+
   return (
     <AlertDialog
       open={Boolean(dishDelete)}
@@ -155,7 +173,7 @@ function AlertDialogDeleteDish({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction>Continue</AlertDialogAction>
+          <AlertDialogAction onClick={() => deleteAccountMutation.mutate((dishDelete as any).id)}>Continue</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -169,7 +187,6 @@ export default function DishTable() {
   const pageIndex = page - 1
   const [dishIdEdit, setDishIdEdit] = useState<number | undefined>()
   const [dishDelete, setDishDelete] = useState<DishItem | null>(null)
-  const data: any[] = []
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -178,6 +195,13 @@ export default function DishTable() {
     pageIndex, // Gía trị mặc định ban đầu, không có ý nghĩa khi data được fetch bất đồng bộ
     pageSize: PAGE_SIZE //default page size
   })
+
+  const dataQuery = useQuery({
+    queryKey: ["dishes-list"],
+    queryFn: dishesAPI.getDishes
+  })
+
+  const data = dataQuery.data?.payload.data ?? []
 
   const table = useReactTable({
     data,
@@ -201,6 +225,10 @@ export default function DishTable() {
     }
   })
 
+  const listRefetch = () => {
+    dataQuery.refetch()
+  }
+
   useEffect(() => {
     table.setPagination({
       pageIndex,
@@ -211,8 +239,8 @@ export default function DishTable() {
   return (
     <DishTableContext.Provider value={{ dishIdEdit, setDishIdEdit, dishDelete, setDishDelete }}>
       <div className='w-full'>
-        <EditDish id={dishIdEdit} setId={setDishIdEdit} />
-        <AlertDialogDeleteDish dishDelete={dishDelete} setDishDelete={setDishDelete} />
+        <EditDish id={dishIdEdit} setId={setDishIdEdit} onSubmitSuccess={listRefetch}/>
+        <AlertDialogDeleteDish onDeleteSuccess={listRefetch} dishDelete={dishDelete} setDishDelete={setDishDelete} />
         <div className='flex items-center py-4'>
           <Input
             placeholder='Lọc tên'
@@ -221,7 +249,7 @@ export default function DishTable() {
             className='max-w-sm'
           />
           <div className='ml-auto flex items-center gap-2'>
-            <AddDish />
+            <AddDish onSubmitSuccess={listRefetch}/>
           </div>
         </div>
         <div className='rounded-md border'>

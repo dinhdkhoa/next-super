@@ -3,8 +3,10 @@ import { useQuery } from "@tanstack/react-query"
 
 const useGetAccount = () => {
   return useQuery({
-    queryKey: ["account-profile"],
-    queryFn: accountAPI.getAccount
+    queryKey: ["get-account-profile"],
+    queryFn: accountAPI.getAccount,
+    staleTime: Infinity,
+    gcTime: Infinity,
   })
 }
 export default useGetAccount

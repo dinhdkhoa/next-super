@@ -5,11 +5,11 @@ export const CreateDishBody = z.object({
   name: z.string().min(1).max(256),
   price: z.coerce.number().positive(),
   description: z.string().max(10000),
-  image: z.string().url(),
+  image: z.string().url().optional(),
   status: z.enum(DishStatusValues).optional()
 })
 
-export type CreateDishBodyType = z.TypeOf<typeof CreateDishBody>
+export type CreateDishBodyType = z.TypeOf<typeof CreateDishBody> 
 
 export const DishSchema = z.object({
   id: z.number(),
@@ -37,7 +37,7 @@ export const DishListRes = z.object({
 export type DishListResType = z.TypeOf<typeof DishListRes>
 
 export const UpdateDishBody = CreateDishBody
-export type UpdateDishBodyType = CreateDishBodyType
+export type UpdateDishBodyType = CreateDishBodyType & {id: number}
 export const DishParams = z.object({
   id: z.coerce.number()
 })

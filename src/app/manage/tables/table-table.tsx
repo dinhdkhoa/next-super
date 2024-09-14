@@ -42,6 +42,9 @@ import AutoPagination from '@/components/auto-pagination'
 import { TableListResType } from '@/schemaValidations/table.schema'
 import EditTable from '@/app/manage/tables/edit-table'
 import AddTable from '@/app/manage/tables/add-table'
+import { useQuery } from '@tanstack/react-query'
+import tableAPI from '@/apiRequests/table'
+import TableQRCode from '@/components/table-qrcode'
 
 type TableItem = TableListResType['data'][0]
 
@@ -76,7 +79,8 @@ export const columns: ColumnDef<TableItem>[] = [
   {
     accessorKey: 'token',
     header: 'QR Code',
-    cell: ({ row }) => <div>{row.getValue('number')}</div>
+    // cell: ({ row }) => <div>{row.getValue('number')}</div>
+    cell: ({ row }) => <TableQRCode token={row.getValue('token')} tableNumber={row.getValue('number')}/>
   },
   {
     id: 'actions',
@@ -151,7 +155,6 @@ export default function TableTable() {
   // const params = Object.fromEntries(searchParam.entries())
   const [tableIdEdit, setTableIdEdit] = useState<number | undefined>()
   const [tableDelete, setTableDelete] = useState<TableItem | null>(null)
-  const data: any[] = []
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -160,6 +163,16 @@ export default function TableTable() {
     pageIndex, // Gía trị mặc định ban đầu, không có ý nghĩa khi data được fetch bất đồng bộ
     pageSize: PAGE_SIZE //default page size
   })
+
+  const dataQuery = useQuery({
+    queryKey: ["table-list"],
+    queryFn: tableAPI.getTables
+  })
+  const data = dataQuery.data?.payload.data ?? []
+
+  const listRefetch = () => {
+    dataQuery.refetch()
+  }
 
   const table = useReactTable({
     data,

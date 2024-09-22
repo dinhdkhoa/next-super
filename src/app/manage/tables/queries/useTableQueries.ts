@@ -1,14 +1,16 @@
+import revalidateTag from "@/apiRequests/revalidate"
 import tableAPI from "@/apiRequests/table"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 
-export const useAddTableMutation = () => {
+export const useAddTableMutation =  () => {
     const queryClient = useQueryClient()
 
     return useMutation({
         mutationFn: tableAPI.addTable,
-        onSuccess: () => {
+        onSuccess: async () => {
             queryClient.invalidateQueries({queryKey: ['tables-list']})
+            await revalidateTag('tables-list')
         }
     })
 }
@@ -32,7 +34,7 @@ export const useEditTable = () => {
 
     return useMutation({
         mutationFn: tableAPI.updateTable,
-        onSuccess: () => {
+        onSuccess: async () => {
             queryClient.invalidateQueries({queryKey: ['tables-list']})
         }
     })
@@ -42,8 +44,9 @@ export const useDeleteTable = () => {
 
     return useMutation({
         mutationFn: tableAPI.deleteTable,
-        onSuccess: () => {
+        onSuccess: async () => {
             queryClient.invalidateQueries({queryKey: ['tables-list']})
+            await revalidateTag('tables-list')
         }
     })
 }

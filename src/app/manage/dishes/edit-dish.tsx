@@ -25,6 +25,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import mediaAPI from '@/apiRequests/media'
 import dishesAPI from '@/apiRequests/dishes'
 import { toast } from 'sonner'
+import revalidateTag from '@/apiRequests/revalidate'
 
 export default function EditDish({
   id,
@@ -98,6 +99,7 @@ export default function EditDish({
         }
         const updateDishRes = await updateDishMutation.mutateAsync({ ...body, id: id as number})
         toast.success(updateDishRes.payload.message)
+        await revalidateTag('tables-list')
         onSubmitSuccess && onSubmitSuccess()
         resetStateOnFormClosed()
       } catch (error) {

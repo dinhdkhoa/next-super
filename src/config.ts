@@ -11,7 +11,6 @@ const config = configSchema.safeParse({
 })
 
 if(!config.success){
-    console.log(config.error.errors)
     throw new Error('Các giá trị env không hợp lệ!!')
 }
 

@@ -1,33 +1,42 @@
-import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-
-const privatePath = ['/manage']
-const authPaths = ['/login', '/register', '/logout', 'refresh-token']
+import { NextResponse } from 'next/server'
+import { checkPathName } from './constants/route-middleware';
 
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
     const {pathname} = request.nextUrl
-    const accessToken = Boolean(request.cookies.get('accessToken'))
-    const refreshToken = Boolean(request.cookies.get('refreshToken'))
 
-    if (privatePath.some(path => pathname.startsWith(path)) && !refreshToken) {
-        const redirectUrl = new URL('/login', request.url)
-        redirectUrl.searchParams.set('rt', 'expired')
-        redirectUrl.searchParams.set('returnUrl', pathname)
-        return NextResponse.redirect(redirectUrl)
-    }
-
-    if (authPaths.some(path => pathname.startsWith(path)) && accessToken && refreshToken) {
-        return NextResponse.redirect(new URL('/manage/dashboard', request.url))
-    }
-
+    const {isAuthPath,isEmployeePath, isGuestPath,isPrivatePath, isPublicPath} = checkPathName(pathname)
     
-    if (privatePath.some(path => pathname.startsWith(path)) && !accessToken && refreshToken ){
+    if(isPublicPath) return NextResponse.next()
+
+    const accessToken = request.cookies.get('accessToken')
+    const refreshToken = request.cookies.get('refreshToken')
+
+    const isSignedIn = Boolean(refreshToken)
+
+    if(!isSignedIn){
+        if(isAuthPath) return NextResponse.next()
+        return NextResponse.redirect(new URL('/login', request.url)) 
+    }
+
+    const isAccessTokenValid = Boolean(accessToken)
+
+    //Refresh Token còn hạn nhưng access token hết hạn và vào private route
+    //thì gọi reresh token mới
+    if(!isAccessTokenValid && isPrivatePath){
         const redirectUrl = new URL('/refresh-token', request.url)
         redirectUrl.searchParams.set('rt', request.cookies.get('refreshToken')?.value || '')
         redirectUrl.searchParams.set('returnUrl',pathname)
         return NextResponse.redirect(redirectUrl)
     }
+
+    //Refresh Token,access token Valid nhưng cố vào AuthPath
+    if(isAuthPath){
+        if(isGuestPath) return NextResponse.redirect(new URL('/', request.url))
+        return NextResponse.redirect(new URL('/manage/dashboard', request.url))
+    }
+
     return NextResponse.next()
 }
 

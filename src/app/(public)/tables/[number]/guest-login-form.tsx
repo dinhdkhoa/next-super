@@ -12,6 +12,7 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { useGuestLoginMutation } from './queries/useGuestAuthQueries'
+import { useEffect } from 'react'
 
 export default function GuestLoginForm() {
   const {setRole} = useAppContext()
@@ -21,6 +22,10 @@ export default function GuestLoginForm() {
 
   const tableToken = queryString.get('token')
   const tableNumber = queryParams.number
+
+  useEffect(() => {
+    if(!tableToken || tableToken === '') router.push('/')
+  }, [tableToken, router])
 
   const form = useForm<GuestLoginBodyType>({
     resolver: zodResolver(GuestLoginBody),

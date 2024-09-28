@@ -1,17 +1,17 @@
 'use client'
 
+import { checkPathName } from "@/constants/route-middleware"
 import { checkAndRefreshToken } from "@/lib/utils"
 import { usePathname, useRouter } from "next/navigation"
 import { useEffect } from "react"
 
-const UNAUTHENTICATED_ROUTE = ['/login', '/register', '/logout', '/refresh-token']
 const CHECK_VALID_TOKEN_INTERVAL = 1000 as const
 
 function RefreshToken() {
     const pathname = usePathname()
     const router = useRouter()
     useEffect(() => {
-        if(UNAUTHENTICATED_ROUTE.includes(pathname) || pathname.startsWith('/tables')) return 
+        if(checkPathName(pathname).isPublicPath || checkPathName(pathname).isAuthPath) return
         let interval : any = null
 
         checkAndRefreshToken(undefined, () => {
@@ -26,7 +26,7 @@ function RefreshToken() {
         return() => {
             clearInterval(interval)
         }
-    },[pathname])
+    },[pathname, router])
 
   return (
     null

@@ -21,20 +21,20 @@ export default function LoginForm() {
   const params = useSearchParams()
   const refreshToken = params.get("rt")
   const returnUrl = params.get("returnUrl")
-  const {setIsAuth} = useAppContext()
+  const {setRole} = useAppContext()
 
   useEffect(() => {
     if(refreshToken == 'expired'){
-      setIsAuth(false)
+      setRole()
     }
-  }, [refreshToken, setIsAuth])
+  }, [refreshToken, setRole])
 
   const loginMutation = useMutation(
     {
       mutationFn: authAPI.loginClient,
       onSuccess: (data) => {
         toast.success(data.payload.message)
-        setIsAuth(true)
+        setRole(data.payload.data.account.role)
         router.push(returnUrl ??'/manage/dashboard')
       },
       onError(error, variables, context) {

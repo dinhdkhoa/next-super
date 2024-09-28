@@ -1,22 +1,49 @@
 'use client'
+import { useAppContext } from '@/components/app-provider'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useForm } from 'react-hook-form'
-import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { handleApiError } from '@/lib/utils'
 import { GuestLoginBody, GuestLoginBodyType } from '@/schemaValidations/guest.schema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { useGuestLoginMutation } from './queries/useGuestAuthQueries'
 
 export default function GuestLoginForm() {
+  const {setRole} = useAppContext()
+  const router = useRouter()
+  const queryString = useSearchParams()
+  const queryParams = useParams()
+
+  const tableToken = queryString.get('token')
+  const tableNumber = queryParams.number
+
   const form = useForm<GuestLoginBodyType>({
     resolver: zodResolver(GuestLoginBody),
     defaultValues: {
       name: '',
-      token: '',
-      tableNumber: 1
+      token: tableToken|| '',
+      tableNumber: Number(tableNumber) || 1
     }
   })
+  const guestLoginMutate = useGuestLoginMutation()
+
+  const handleSubmit = () => {
+    if(guestLoginMutate.isPending) return 
+    guestLoginMutate.mutateAsync(form.getValues(),{
+      onSuccess: (data) => {
+        toast.success(data.payload.message)
+        setRole(data.payload.data.guest.role)
+        router.push('/guest/menu')},
+      onError(error) {
+        handleApiError(error, form.setError)
+      },
+    })
+  }
 
   return (
     <Card className='mx-auto max-w-sm'>
@@ -25,7 +52,7 @@ export default function GuestLoginForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form className='space-y-2 max-w-[600px] flex-shrink-0 w-full' noValidate>
+          <form className='space-y-2 max-w-[600px] flex-shrink-0 w-full' noValidate onSubmit={form.handleSubmit(handleSubmit)}>
             <div className='grid gap-4'>
               <FormField
                 control={form.control}

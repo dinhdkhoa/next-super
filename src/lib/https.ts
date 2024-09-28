@@ -1,6 +1,7 @@
 import envConfig from "@/config"
 import { LoginResType } from "@/schemaValidations/auth.schema"
 import { redirect } from "next/navigation"
+import StorageService from "./storage"
 
 type CustomRequest = RequestInit & { baseUrl?: string | undefined }
 
@@ -125,16 +126,15 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
     }
 
     if(isClient){
-        if (url === 'api/auth/login' || url === 'auth/register' || url === 'api/auth/refresh-token') {
-            localStorage.setItem('accessToken',(payload as LoginResType).data.accessToken)
-            localStorage.setItem('refreshToken',(payload as LoginResType).data.refreshToken)
+        if (url === 'api/auth/login' || url === 'auth/register' || url === 'api/auth/refresh-token' || url === 'api/guest/auth/login') {
+            StorageService.setAccessToken((payload as LoginResType).data.accessToken)
+            StorageService.setRefreshToken((payload as LoginResType).data.refreshToken)
             //  handle auth with cookies
             // clientSessionToken.value = (payload as LoginResType).data.token;
             // clientSessionToken.expiresAt = (payload as LoginResType).data.expiresAt;
 
-        } else if (url === 'api/auth/logout') {
-            localStorage.removeItem('accessToken')
-            localStorage.removeItem('refreshToken')
+        } else if (url === 'api/auth/logout' || url === 'api/guest/auth/logout') {
+            StorageService.removeTokens()
             //  handle auth with cookies
             // clientSessionToken.value = '';
             // clientSessionToken.expiresAt = new Date().toUTCString()
@@ -164,8 +164,7 @@ const handleUnthorizedResponseOnClient = async (baseHeader: HeadersInit | undefi
         )
         // clientSessionToken.value = '';
         // clientSessionToken.expiresAt = '';
-        localStorage.removeItem('accessToken')
-        localStorage.removeItem('refreshToken')
+        StorageService.removeTokens()
         location.href = '/login?sessionExpired=true'
 }
 

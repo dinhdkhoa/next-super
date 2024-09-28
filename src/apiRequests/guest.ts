@@ -1,10 +1,11 @@
 import http from "@/lib/https";
 import { LoginBodyType, LoginResType, RefreshTokenBodyType, RefreshTokenResType } from "@/schemaValidations/auth.schema";
+import { GuestLoginBodyType, GuestLoginResType } from "@/schemaValidations/guest.schema";
 
 const guestAPI = {
     refreshTokenReq: null as Promise<{ status: number, payload: RefreshTokenResType }> | null,
-    loginServer: (body: LoginBodyType) => http.post<LoginResType>('/guest/auth/login', body),
-    loginClient: (body: LoginBodyType) => http.post<LoginResType>('api/guest/auth/login', body, {
+    loginServer: (body: GuestLoginBodyType) => http.post<GuestLoginResType>('/guest/auth/login', body),
+    loginClient: (body: GuestLoginBodyType) => http.post<GuestLoginResType>('api/guest/auth/login', body, {
         baseUrl: ''
     }),
     logoutServer: (body: {
@@ -20,7 +21,7 @@ const guestAPI = {
     logoutClient: () => http.post<{message: string}>('api/guest/auth/logout', null, {
         baseUrl: ''
     }),
-    refreshTokenServer: (body: RefreshTokenBodyType) => http.post<RefreshTokenResType>('auth/guest/refresh-token', body),
+    refreshTokenServer: (body: RefreshTokenBodyType) => http.post<RefreshTokenResType>('/guest/auth/refresh-token', body),
     async refreshTokenClient(){
         if (this.refreshTokenReq){
             return this.refreshTokenReq

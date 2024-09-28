@@ -1,8 +1,5 @@
 import authAPI from "@/apiRequests/auth";
-import { LoginBodyType } from "@/schemaValidations/auth.schema";
 import { cookies } from "next/headers";
-import jwt from 'jsonwebtoken'
-import { HttpError } from "@/lib/https";
 
 interface AppRequest<T = any> extends Request {
     json: () => Promise<T>;

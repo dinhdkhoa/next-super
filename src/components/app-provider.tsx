@@ -6,35 +6,44 @@ import {
 } from "@tanstack/react-query"
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react'
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
+import { RoleType, TokenPayload } from "@/types/jwt.types"
+import jwt from 'jsonwebtoken'
 
 
-const AppContext = createContext({
+const AppContext = createContext<{
+  setRole: (role?: RoleType) => void,
+  isAuth: boolean,
+  role?: RoleType
+}>({
   isAuth: false,
-  setIsAuth: (isAuth: boolean) => {}
+  role: undefined ,
+  setRole: (role?: RoleType) => {}
 })
 
 export const useAppContext = () => useContext(AppContext)
 
 export default function AppProvider({children} : {children: ReactNode}) {
 
-const [isAuth, setIsAuthState] = useState(false)
+const [role, setRoleState] = useState<RoleType | undefined>(undefined)
 
 useEffect(() => {
   const accessToken = StorageService.getAccessToken()
   if(accessToken){
-    setIsAuthState(true)
-  }
+    const jwtInfo = jwt.decode(accessToken) as TokenPayload
+    setRoleState(jwtInfo.role)
+  } 
 },[])
 
-const setIsAuth = useCallback((isAuth: boolean) => {
-  if(isAuth) {
-    setIsAuthState(true)
+const setRole = useCallback((role?: RoleType) => {
+  if(role) {
+    setRoleState(role)
   } else {
-    setIsAuthState(false)
+    setRoleState(undefined)
     StorageService.removeTokens()
   }
 }, [])
 
+const isAuth = Boolean(role)
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -46,7 +55,7 @@ const queryClient = new QueryClient({
 })
 
   return (
-   <AppContext.Provider value={{isAuth,setIsAuth}}>
+   <AppContext.Provider value={{isAuth,setRole}}>
     <QueryClientProvider client={queryClient}>
       {children}
       <ReactQueryDevtools initialIsOpen={false} />

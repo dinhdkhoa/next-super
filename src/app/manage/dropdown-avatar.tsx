@@ -23,7 +23,7 @@ import { useAppContext } from '@/components/app-provider'
 export default function DropdownAvatar() {
   const router = useRouter()
   const {data} = useGetAccount()
-  const {setIsAuth} = useAppContext()
+  const {setRole} = useAppContext()
 
   const account = data?.payload.data
 
@@ -36,7 +36,7 @@ export default function DropdownAvatar() {
       await logoutMutation.mutate(null as any, {
         onSuccess(data, variables, context) {
            router.push("/login")
-          setIsAuth(false)
+           setRole()
         },
       })
     } catch (error) {

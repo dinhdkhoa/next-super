@@ -11,7 +11,7 @@ function RefreshToken() {
     const pathname = usePathname()
     const router = useRouter()
     useEffect(() => {
-        if(UNAUTHENTICATED_ROUTE.includes(pathname)) return 
+        if(UNAUTHENTICATED_ROUTE.includes(pathname) || pathname.startsWith('/tables')) return 
         let interval : any = null
 
         checkAndRefreshToken(undefined, () => {

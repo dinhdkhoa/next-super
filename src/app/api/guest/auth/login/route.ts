@@ -4,13 +4,14 @@ import { cookies } from "next/headers";
 import jwt from 'jsonwebtoken'
 import { HttpError } from "@/lib/https";
 import guestAPI from "@/apiRequests/guest";
+import { GuestLoginBodyType } from "@/schemaValidations/guest.schema";
 
 interface AppRequest<T = any> extends Request {
     json: () => Promise<T>;
 }
 
 
-export async function POST(request: AppRequest<LoginBodyType>) {
+export async function POST(request: AppRequest<GuestLoginBodyType>) {
     const body = await request.json()
     const nextCookies = cookies()
     try {

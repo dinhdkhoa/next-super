@@ -37,7 +37,7 @@ export const UpdateTableBody = z.object({
   capacity: z.coerce.number().positive(),
   status: z.enum(TableStatusValues).optional()
 })
-export type UpdateTableBodyType = z.TypeOf<typeof UpdateTableBody> & {id: number}
+export type UpdateTableBodyType = z.TypeOf<typeof UpdateTableBody>
 export const TableParams = z.object({
   number: z.coerce.number()
 })

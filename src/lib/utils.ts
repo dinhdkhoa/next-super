@@ -6,8 +6,10 @@ import { FormError, HttpError } from "./https"
 import StorageService from "./storage"
 import jwt from 'jsonwebtoken'
 import authAPI from "@/apiRequests/auth"
-import { DishStatus, OrderStatus, TableStatus } from "@/constants/type"
+import { DishStatus, OrderStatus, Role, TableStatus } from "@/constants/type"
 import envConfig from "@/config"
+import { TokenPayload } from "@/types/jwt.types"
+import guestAPI from "@/apiRequests/guest"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -42,8 +44,8 @@ export async function checkAndRefreshToken(onSuccess?: () => void, onError?: () 
     return onError && onError()
   }
 
-  const decodedAT = accessToken ? jwt.decode(accessToken) as { exp: number, iat: number } : { exp: 0, iat: 0 }
-  const decodedRT = jwt.decode(refreshToken) as { exp: number }
+  const decodedAT = accessToken ? jwt.decode(accessToken) as TokenPayload : { exp: 0, iat: 0 }
+  const decodedRT = jwt.decode(refreshToken) as TokenPayload
 
   const now = new Date().getTime() / 1000 // get epoch time in ms
 
@@ -57,7 +59,12 @@ export async function checkAndRefreshToken(onSuccess?: () => void, onError?: () 
 
   if (accessTokenValidTimeLeft < accessTokenDuration / 3) {
     try {
-      await authAPI.refreshTokenClient()
+      const role = decodedRT.role
+      if(role !== Role.Guest){
+        await authAPI.refreshTokenClient()
+      } else {
+        await guestAPI.refreshTokenClient()
+      }
       onSuccess && onSuccess()
 
     } catch (error) {

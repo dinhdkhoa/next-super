@@ -5,7 +5,7 @@ import { CreateTableBodyType, TableListResType, TableResType, UpdateTableBodyTyp
 const tableAPI = {
     getTables: () => http.get<TableListResType>('tables'),
     getTableDetail: (id: number) => http.get<TableResType>(`tables/${id}`),
-    updateTable: ({id, ...body}: UpdateTableBodyType) => http.put<TableResType>(`tables/${id}`,body),
+    updateTable: ({id, ...body}: UpdateTableBodyType & {id: number}) => http.put<TableResType>(`tables/${id}`,body),
     deleteTable: (id: number) => http.delete<TableResType>(`tables/${id}`),
     addTable: (body: CreateTableBodyType) => http.post<TableResType>(`tables`, body),
 }

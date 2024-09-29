@@ -2,6 +2,9 @@ import envConfig from "@/config"
 import { LoginResType } from "@/schemaValidations/auth.schema"
 import { redirect } from "next/navigation"
 import StorageService from "./storage"
+import { RoleType, TokenPayload } from "@/types/jwt.types"
+import jwt from 'jsonwebtoken'
+import { Role } from "@/constants/type"
 
 type CustomRequest = RequestInit & { baseUrl?: string | undefined }
 
@@ -80,7 +83,7 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
     }
 
     if(isClient){
-        const accessToken = localStorage.getItem('accessToken')
+        const accessToken = StorageService.getAccessToken()
         if(accessToken){
             baseHeader.Authorization = `Bearer ${accessToken}`
         }
@@ -153,7 +156,12 @@ const isFormData = (body: BodyInit | null | undefined ) => {
 
 const handleUnthorizedResponseOnClient = async (baseHeader: HeadersInit | undefined) : Promise<void | string> => {
    // handle 401 on client
-        await fetch('api/auth/logout', 
+        let role : RoleType | null = null
+        const accessToken = StorageService.getAccessToken()
+        if(accessToken) role = (jwt.decode(accessToken) as TokenPayload).role
+        const logoutURL = role == Role.Guest ? 'api/guest/auth/logout' : 'api/auth/logout'
+
+        await fetch(logoutURL, 
             {
                 method: 'POST',
                 body: null,

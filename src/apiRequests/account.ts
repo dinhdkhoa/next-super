@@ -8,7 +8,7 @@ const accountAPI = {
     changePW: (body: ChangePasswordBodyType) => http.put<AccountResType>('accounts/change-password', body),
     addEmployee: (body: CreateEmployeeAccountBodyType) => http.post<AccountResType>('accounts', body),
     getAccountList: () => http.get<AccountListResType>('accounts'),
-    updateEmployee: ({id, ...body} : UpdateEmployeeAccountBodyType) => http.put<AccountResType>(`accounts/detail/${id}`, body),
+    updateEmployee: ({id, ...body} : UpdateEmployeeAccountBodyType & {id: number}) => http.put<AccountResType>(`accounts/detail/${id}`, body),
     getEmployeeDetail: (id: number) => http.get<AccountResType>(`accounts/detail/${id}`),
     deleteEmployeeDetail: (id: number) => http.delete<AccountResType>(`accounts/detail/${id}`)
 }

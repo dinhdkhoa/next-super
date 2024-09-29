@@ -84,7 +84,7 @@ export default function EditEmployee({
   const handleSubmit =
     async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault()
-      if (uploadProfileImg.isPending || updateEmployeeMutation.isPending) return
+      if (uploadProfileImg.isPending || updateEmployeeMutation.isPending || !id) return
       const body = form.getValues()
       try {
         if (file) {

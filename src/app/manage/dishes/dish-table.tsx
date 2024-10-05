@@ -48,6 +48,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import accountAPI from '@/apiRequests/account'
 import { toast } from 'sonner'
 import { handleApiError } from '@/lib/utils'
+import useGetDishes from '@/queries/useGetDishes'
 
 type DishItem = DishListResType['data'][0]
 
@@ -196,10 +197,7 @@ export default function DishTable() {
     pageSize: PAGE_SIZE //default page size
   })
 
-  const dataQuery = useQuery({
-    queryKey: ["dishes-list"],
-    queryFn: dishesAPI.getDishes
-  })
+  const dataQuery = useGetDishes()
 
   const data = dataQuery.data?.payload.data ?? []
 

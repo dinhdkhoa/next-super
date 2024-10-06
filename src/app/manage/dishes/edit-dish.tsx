@@ -110,7 +110,7 @@ export default function EditDish({
   const resetStateOnFormClosed = () => {
     setId(undefined)
     if(file) setFile(null)
-    form.setValue('image', undefined)
+    form.setValue('image', '')
   }
 
   return (

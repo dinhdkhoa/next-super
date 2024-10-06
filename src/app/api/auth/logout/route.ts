@@ -11,6 +11,8 @@ export async function POST() {
     const accessToken = nextCookies.get('accessToken')?.value
     const refreshToken = nextCookies.get('refreshToken')?.value
     if (!accessToken || !refreshToken){
+        nextCookies.delete('accessToken')
+        nextCookies.delete('refreshToken')
         return Response.json({
             message: 'Không tìm thấy access token hoặc refresh token'
         }, {

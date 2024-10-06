@@ -27,7 +27,7 @@ export const handleApiError = (error: unknown, setError?: UseFormSetError<any>, 
     toast.error(error.message, {
       duration
     })
-  } else if (error && typeof error === 'object' && 'message' in error) {
+  } else if (error && typeof error === 'object' && 'message' in error && isClient) {
     toast.error(String(error.message), {
       duration
     })

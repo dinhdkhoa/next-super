@@ -24,6 +24,7 @@ export async function POST() {
         const loginRes = await authAPI.refreshTokenServer({ refreshToken: refreshToken })
         const { payload } = loginRes
         const { accessToken, refreshToken: refreshTokenRes } = payload.data
+        console.log(accessToken, refreshTokenRes)
 
         const decodedAT = jwt.decode(accessToken) as { exp: number }
         const decodedRT = jwt.decode(refreshTokenRes) as { exp: number }

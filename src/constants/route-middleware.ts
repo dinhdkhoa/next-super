@@ -1,4 +1,4 @@
-const authPaths = ['/login', '/register', '/logout', 'refresh-token', '/tables']
+const authPaths = ['/login', '/register', '/tables']
 const guestPaths = ['/guest']
 const employeePaths = ['/manage']
 const privatePath = [...guestPaths, ...employeePaths]
@@ -17,7 +17,7 @@ const isPrivatePath = (pathName: string) => {
 } 
 
 const isPublicPath = (pathName: string) => {
-    return pathName === '/' || (!isPrivatePath(pathName) && !isAuthPath(pathName))
+    return( pathName === '/' || (!isPrivatePath(pathName) && !isAuthPath(pathName))) && pathName !== '/refresh-token' && pathName !== '/logout'
 } 
 
 const checkPathName = (pathName: string) => {

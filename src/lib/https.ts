@@ -129,7 +129,7 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
     }
 
     if(isClient){
-        if (url === 'api/auth/login' || url === 'auth/register' || url === 'api/auth/refresh-token' || url === 'api/guest/auth/login') {
+        if (url === 'api/auth/login' || url === 'auth/register' || url === 'api/auth/refresh-token' || url === 'api/guest/auth/refresh-token' || url === 'api/guest/auth/login') {
             StorageService.setAccessToken((payload as LoginResType).data.accessToken)
             StorageService.setRefreshToken((payload as LoginResType).data.refreshToken)
             //  handle auth with cookies

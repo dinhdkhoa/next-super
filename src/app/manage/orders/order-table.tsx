@@ -33,6 +33,8 @@ import { endOfDay, format, startOfDay } from 'date-fns'
 import TableSkeleton from '@/app/manage/orders/table-skeleton'
 import { toast } from '@/components/ui/use-toast'
 import { GuestCreateOrdersResType } from '@/schemaValidations/guest.schema'
+import { useAdminGetListOrder } from './queries/useAdminOrder'
+import { useGetTableDetail } from '../tables/queries/useTableQueries'
 
 export const OrderTableContext = createContext({
   setOrderIdEdit: (value: number | undefined) => {},
@@ -65,8 +67,10 @@ export default function OrderTable() {
   const page = searchParam.get('page') ? Number(searchParam.get('page')) : 1
   const pageIndex = page - 1
   const [orderIdEdit, setOrderIdEdit] = useState<number | undefined>()
-  const orderList: any = []
-  const tableList: any = []
+  const orderListQuery = useAdminGetListOrder({fromDate, toDate})
+  const tableListQuery = useGetTableDetail()
+  const orderList = orderListQuery.data?.payload.data ?? []
+  const tableList = tableListQuery.data?.payload.data ?? []
   const tableListSortedByNumber = tableList.sort((a: any, b: any) => a.number - b.number)
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -226,7 +230,8 @@ export default function OrderTable() {
           tableList={tableListSortedByNumber}
           servingGuestByTableNumber={servingGuestByTableNumber}
         />
-        {/* <TableSkeleton /> */}
+      {orderListQuery.isPending &&   <TableSkeleton />}
+      {!orderListQuery.isPending && 
         <div className='rounded-md border'>
           <Table>
             <TableHeader>
@@ -260,7 +265,7 @@ export default function OrderTable() {
               )}
             </TableBody>
           </Table>
-        </div>
+        </div>}
         <div className='flex items-center justify-end space-x-2 py-4'>
           <div className='text-xs text-muted-foreground py-4 flex-1 '>
             Hiển thị <strong>{table.getPaginationRowModel().rows.length}</strong> trong{' '}

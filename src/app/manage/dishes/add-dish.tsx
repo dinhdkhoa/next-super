@@ -67,7 +67,7 @@ export default function AddDish(
         const imgURL = uploadDataRes.payload.data
         body.image = imgURL
       } else {
-        body.image = undefined
+        body.image = undefined as any
       }
 
       const addDishRes = await addDishMutation.mutateAsync(body)
@@ -82,7 +82,7 @@ export default function AddDish(
 
   const resetForm = () => {
     setFile(null)
-    form.setValue('image', undefined)
+    form.setValue('image', undefined as any)
     form.reset()
   }
 

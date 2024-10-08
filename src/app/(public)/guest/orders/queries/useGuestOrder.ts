@@ -10,6 +10,6 @@ export const useGuestOrderMutation = () => {
 export const useGuestOrderList = () => {
     return useQuery({
         queryKey: ['orders'],
-        queryFn: orderAPI.guestGetOrder
+        queryFn: () => orderAPI.guestGetOrder
     })
 }

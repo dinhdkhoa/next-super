@@ -5,9 +5,12 @@ import { GetOrdersResType, UpdateOrderBodyType, UpdateOrderResType } from "@/sch
 
 const orderAPI = {
     guestOrder: (body: GuestCreateOrdersBodyType) => http.post<GuestCreateOrdersResType>('/guest/orders', body),
-    guestGetOrder: () => http.get<GuestGetOrdersResType>('/guest/orders',  { next: { tags: ['guest-order-list'] } }),
+    guestGetOrder: (token?: string) => http.get<GuestGetOrdersResType>('/guest/orders',  {
+    headers: {
+        Authorization: `Bearer ${token}`
+    } }),
     adminGetOrderList:  () => http.get<GetOrdersResType>('/orders'),
-    adminUpdateOrder:  (orderId: number, body: UpdateOrderBodyType) => http.post<UpdateOrderResType>(`/orders${orderId}`, body),
+    adminUpdateOrder:  (orderId: number, body: UpdateOrderBodyType) => http.put<UpdateOrderResType>(`/orders/${orderId}`, body),
 }
 
 export default orderAPI

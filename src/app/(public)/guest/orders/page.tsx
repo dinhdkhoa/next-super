@@ -3,11 +3,13 @@ import GuestOrder from './guest-order'
 import guestAPI from '@/apiRequests/guest'
 import orderAPI from '@/apiRequests/order'
 import { handleApiError } from '@/lib/utils'
-
+import { cookies } from 'next/headers'
 export default async function GuestOrderPage() {
   let orders : GuestGetOrdersResType['data'] = []
   try {
-    const data = await orderAPI.guestGetOrder()
+    const cookieStore = cookies()
+    const token = cookieStore.get('accessToken')
+    const data = await orderAPI.guestGetOrder(token?.value)
     orders = data.payload.data
   } catch(error) {
     handleApiError(error)

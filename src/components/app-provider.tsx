@@ -55,7 +55,7 @@ const queryClient = new QueryClient({
 })
 
   return (
-   <AppContext.Provider value={{isAuth,setRole}}>
+   <AppContext.Provider value={{isAuth,setRole,role}}>
     <QueryClientProvider client={queryClient}>
       {children}
       <ReactQueryDevtools initialIsOpen={false} />

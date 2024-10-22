@@ -1,6 +1,8 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { checkPathName } from './constants/route-middleware';
+import jwt from 'jsonwebtoken'
+import { TokenPayload } from './types/jwt.types';
 
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
@@ -36,6 +38,11 @@ export function middleware(request: NextRequest) {
         if(isGuestPath) return NextResponse.redirect(new URL('/', request.url))
         return NextResponse.redirect(new URL('/manage/dashboard', request.url))
     }
+
+    const {role} = jwt.decode((accessToken?.value)!) as TokenPayload
+
+    if(role == 'Guest' && !isGuestPath) return NextResponse.redirect(new URL('/', request.url))
+    if(role !== 'Guest' && isGuestPath) return NextResponse.redirect(new URL('/manage/dashboard', request.url))
 
     return NextResponse.next()
 }

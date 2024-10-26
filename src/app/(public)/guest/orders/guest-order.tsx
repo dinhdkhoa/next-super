@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { Minus, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { cn, formatCurrency } from '@/lib/utils'
+import { cn, formatCurrency, getVietnameseDishStatus, getVietnameseOrderStatus } from '@/lib/utils'
 import useGetDishes from '@/queries/useGetDishes'
 import { GuestCreateOrdersBody, GuestCreateOrdersBodyType, GuestGetOrdersResType } from '@/schemaValidations/guest.schema'
 import { DishStatus } from '@/constants/type'
@@ -72,7 +72,7 @@ function GuestOrder({orders} : {orders: GuestGetOrdersResType['data']}) {
                         <p className='text-xs font-semibold'>{formatCurrency(order.dishSnapshot.price)} x {order.quantity}</p>
                     </div>
                     <div className='flex-shrink-0 ml-auto flex justify-end items-center'>
-                        <Badge variant={'secondary'}>{order.status}</Badge>
+                        <Badge variant={'secondary'}>{getVietnameseOrderStatus(order.status)}</Badge>
                     </div>
                 </div>
             ))}

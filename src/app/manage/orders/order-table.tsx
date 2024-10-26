@@ -15,7 +15,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { GetOrdersResType, PayGuestOrdersResType, UpdateOrderResType } from '@/schemaValidations/order.schema'
 import AddOrder from '@/app/manage/orders/add-order'
 import EditOrder from '@/app/manage/orders/edit-order'
-import { createContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import AutoPagination from '@/components/auto-pagination'
 import { getVietnameseOrderStatus, handleApiError } from '@/lib/utils'
@@ -31,10 +31,11 @@ import { Command, CommandGroup, CommandItem, CommandList } from '@/components/ui
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { endOfDay, format, startOfDay } from 'date-fns'
 import TableSkeleton from '@/app/manage/orders/table-skeleton'
-import { toast } from '@/components/ui/use-toast'
+import { toast } from 'sonner'
 import { GuestCreateOrdersResType } from '@/schemaValidations/guest.schema'
-import { useAdminGetListOrder } from './queries/useAdminOrder'
+import { useAdminGetListOrder, useAdminUpdateOrderDetail } from './queries/useAdminOrder'
 import { useGetTableDetail } from '../tables/queries/useTableQueries'
+import { socket } from '@/lib/socket'
 
 export const OrderTableContext = createContext({
   setOrderIdEdit: (value: number | undefined) => {},
@@ -59,6 +60,7 @@ export type ServingGuestByTableNumber = Record<number, OrderObjectByGuestID>
 const PAGE_SIZE = 10
 const initFromDate = startOfDay(new Date())
 const initToDate = endOfDay(new Date())
+
 export default function OrderTable() {
   const searchParam = useSearchParams()
   const [openStatusFilter, setOpenStatusFilter] = useState(false)
@@ -67,10 +69,14 @@ export default function OrderTable() {
   const page = searchParam.get('page') ? Number(searchParam.get('page')) : 1
   const pageIndex = page - 1
   const [orderIdEdit, setOrderIdEdit] = useState<number | undefined>()
+
   const orderListQuery = useAdminGetListOrder({fromDate, toDate})
   const tableListQuery = useGetTableDetail()
   const orderList = orderListQuery.data?.payload.data ?? []
   const tableList = tableListQuery.data?.payload.data ?? []
+  const updateOrderMutation = useAdminUpdateOrderDetail()
+
+
   const tableListSortedByNumber = tableList.sort((a: any, b: any) => a.number - b.number)
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -88,7 +94,14 @@ export default function OrderTable() {
     dishId: number
     status: (typeof OrderStatusValues)[number]
     quantity: number
-  }) => {}
+  }) => {
+    if(updateOrderMutation.isPending) return
+    try {
+      await updateOrderMutation.mutateAsync(body)
+    } catch (error) {
+      handleApiError(error)
+    }
+  }
 
   const table = useReactTable({
     data: orderList,
@@ -133,8 +146,9 @@ export default function OrderTable() {
         orderObjectByGuestId
       }}
     >
+      <OrderTableSocket refetch={orderListQuery.refetch} toDate={toDate}/>
       <div className='w-full'>
-        <EditOrder id={orderIdEdit} setId={setOrderIdEdit} onSubmitSuccess={() => {}} />
+        <EditOrder id={orderIdEdit} setId={setOrderIdEdit} onSubmitSuccess={() => orderListQuery.refetch()} />
         <div className=' flex items-center'>
           <div className='flex flex-wrap gap-2'>
             <div className='flex items-center'>
@@ -282,4 +296,51 @@ export default function OrderTable() {
       </div>
     </OrderTableContext.Provider>
   )
+}
+
+
+const OrderTableSocket = ({toDate, refetch} : {toDate: Date, refetch : any}) => {
+  useEffect(() => {
+    if(socket.connected){
+        onConnect()
+    }
+    if(socket.disconnected){
+        onDisconnect()
+    }
+
+    function refetchOrderList(){
+      if(toDate.toDateString() == new Date().toDateString()) refetch()
+    }
+
+    function onConnect() {
+        console.log('Connected',socket.id)
+    }
+    
+    function onDisconnect() {
+        console.log(socket.id, 'Disconnected')
+    }
+    function onNewOrder(data: GuestCreateOrdersResType['data']) {
+      const {guest } = data[0]
+      toast.info(`${guest?.name} tại bàn ${guest?.tableNumber} vừa đặt ${data.length} đơn`)
+      refetchOrderList()
+    }
+
+    function onUpdateOrder(data: UpdateOrderResType['data']){
+        toast.info(`Món ${data.dishSnapshot.name} (SL: ${data.quantity}) vừa đc cập nhật sang trạng thái ${data.status}`)
+        refetchOrderList()
+    }
+
+    socket.on('connect', onConnect);
+    socket.on('disconnect', onDisconnect);
+    socket.on('new-order', onNewOrder);
+    socket.on('update-order', onUpdateOrder);
+
+    return () => {
+      socket.off('connect', onConnect);
+      socket.off('disconnect', onDisconnect);
+      socket.off('update-order', onUpdateOrder);
+      socket.off('new-order', onNewOrder);
+    };
+  }, []);
+  return null
 }

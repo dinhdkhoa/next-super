@@ -7,14 +7,16 @@ import { UpdateOrderBody, UpdateOrderBodyType } from '@/schemaValidations/order.
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { getVietnameseOrderStatus } from '@/lib/utils'
+import { getVietnameseOrderStatus, handleApiError } from '@/lib/utils'
 import { OrderStatus, OrderStatusValues } from '@/constants/type'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { DishesDialog } from '@/app/manage/orders/dishes-dialog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { useEffect, useState } from 'react'
 import { DishListResType } from '@/schemaValidations/dish.schema'
-import { useAdminGetOrderDetail } from './queries/useAdminOrder'
+import { useAdminGetOrderDetail, useAdminUpdateOrderDetail } from './queries/useAdminOrder'
+import { previousDay } from 'date-fns'
+import { toast } from 'sonner'
 
 
 export default function EditOrder({
@@ -26,7 +28,9 @@ export default function EditOrder({
   setId: (value: number | undefined) => void
   onSubmitSuccess?: () => void
 }) {
-  const orderDetailQuery = useAdminGetOrderDetail(id as any)
+  const orderDetailQuery = useAdminGetOrderDetail(id as number)
+  const updateOrderMutation = useAdminUpdateOrderDetail()
+
   const orderDetail = orderDetailQuery.data?.payload.data
   const [selectedDish, setSelectedDish] = useState(orderDetail?.dishSnapshot)
   useEffect(() => {
@@ -49,7 +53,17 @@ export default function EditOrder({
     }
   })
 
-  const onSubmit = async (values: UpdateOrderBodyType) => {}
+  const onSubmit = async (values: UpdateOrderBodyType) => {
+    if(updateOrderMutation.isPending || !orderDetail) return
+    try {
+      const resp =  await updateOrderMutation.mutateAsync({orderId: orderDetail.id || 0, ...values})
+      toast.success(`${resp.payload.message}`)
+      reset()
+      onSubmitSuccess && onSubmitSuccess()
+    } catch (error) {
+      handleApiError(error)
+    }
+  }
 
   const reset = () => {
     setId(undefined)
@@ -93,7 +107,11 @@ export default function EditOrder({
                     <DishesDialog
                       onChoose={(dish) => {
                         field.onChange(dish.id)
-                        // setSelectedDish(dish)
+                        setSelectedDish({
+                          ...dish,
+                          dishId: dish.id,
+                          id: selectedDish?.id || 0
+                        })
                       }}
                     />
                   </FormItem>

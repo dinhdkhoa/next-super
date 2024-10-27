@@ -177,19 +177,26 @@ export default function EditTable({
                 <div className='grid grid-cols-4 items-center justify-items-start gap-4'>
                   <Label>URL gọi món</Label>
                   <div className='col-span-3 w-full space-y-2'>
-                    <Link
-                      href={getTableLink({
-                        token: data?.payload.data.token || '',
-                        tableNumber: data?.payload.data.number || 0
-                      })}
-                      target='_blank'
-                      className='break-all'
+                    <span
+                      // href={getTableLink({
+                      //   token: data?.payload.data.token || '',
+                      //   tableNumber: data?.payload.data.number || 0
+                      // })}
+                      // target='_blank'
+                      className='break-all cursor-copy hover:underline hover:text-muted-foreground'
+                      onClick={() => {
+                        navigator.clipboard.writeText(getTableLink({
+                          token: data?.payload.data.token || '',
+                          tableNumber: data?.payload.data.number || 0
+                        }));
+                        toast.success('Link Copied')
+                      }}
                     >
                       {getTableLink({
                         token: data?.payload.data.token || '',
                         tableNumber: data?.payload.data.number || 0
                       })}
-                    </Link>
+                    </span>
                   </div>
                 </div>
               </FormItem>

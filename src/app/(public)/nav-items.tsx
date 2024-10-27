@@ -1,11 +1,15 @@
 'use client'
 
 import { useAppContext } from '@/components/app-provider'
+import { Button } from '@/components/ui/button'
 import { checkPathName, isEmployeePath } from '@/constants/route-middleware'
 import { Role } from '@/constants/type'
 import StorageService from '@/lib/storage'
+import { handleApiError } from '@/lib/utils'
+import useLogout from '@/queries/useLogout'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 const menuItems = [
@@ -15,7 +19,7 @@ const menuItems = [
   },
   {
     title: 'Đơn hàng',
-    href: 'guest/orders',
+    href: '/guest/orders',
     role: Role.Guest
   },
   // {
@@ -28,41 +32,59 @@ const menuItems = [
     href: '/manage/dashboard',
     role: Role.Employee
   },
-  {
-    title: 'Đăng xuất',
-    href: '/guest/logout',
-    role: Role.Guest
-  },
 
 ]
 
 export default function NavItems({ className }: { className?: string }) {
-  const {isAuth : isSignedIn, role} = useAppContext()
+
+  const { isAuth: isSignedIn, role, setRole } = useAppContext()
   const pathname = usePathname()
+  const logoutMutation = useLogout()
+  const router = useRouter()
 
-  const {isGuestPath, isEmployeePath} = checkPathName(pathname)
+  const handleLogout = async () => {
+    if(logoutMutation.isPending) return 
 
-  if (!isSignedIn || !role) return (<Link href={menuItems[0].href}  className={className}>
-          {menuItems[0].title}
-        </Link>)
+    try {
+      await logoutMutation.mutate(null as any, {
+        onSuccess() {
+           setRole()
+           router.push('/')
+        },
+      })
+    } catch (error) {
+      handleApiError(error)
+    }
+  }
+
+  const { isGuestPath, isEmployeePath } = checkPathName(pathname)
+
+  if (!isSignedIn || !role) return (<Link href={menuItems[0].href} className={className}>
+    {menuItems[0].title}
+  </Link>)
 
   const menuItemsFiltered = menuItems.filter(item => {
-    switch(role){
+    switch (role) {
       case 'Guest':
         return isGuestPath && (item.role == 'Guest' || !item.role)
       case 'Employee':
         return isEmployeePath && (item.role == 'Employee' || !item.role)
-      default: 
+      default:
         return item.role !== 'Guest'
     }
   })
 
-  return menuItemsFiltered.map((item) => {
+  return <>
+    {menuItemsFiltered.map((item) => {
       return (
         <Link href={item.href} key={item.href} className={className}>
           {item.title}
         </Link>
       )
-  })
+    })}
+    <Button variant='link' className='hover:no-underline p-0 text-muted-foreground' onClick={handleLogout}>
+      Đăng xuất
+    </Button>
+  </>
 }
 

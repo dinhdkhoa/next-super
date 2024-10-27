@@ -44,8 +44,8 @@ function MenuOrder() {
         guestOrderMutation.mutate(orderPayload,
             {onSuccess: async (data) => {
                 toast.success(data.payload.message)
-                await revalidateTag('guest-order-list')
                 router.push('orders')
+                router.refresh()
             }, onError(err){
                 handleApiError(err)
             }}

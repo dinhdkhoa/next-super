@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { Minus, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -14,43 +14,69 @@ import { useRouter } from 'next/navigation'
 import { UpdateOrderResType } from '@/schemaValidations/order.schema'
 import { toast } from 'sonner'
 
-function GuestOrder({orders} : {orders: GuestGetOrdersResType['data']}) {
+function GuestOrder({ orders }: { orders: GuestGetOrdersResType['data'] }) {
     const router = useRouter()
-    const totalPrice = orders.reduce((total, order) => {
-        return total += order.quantity * (order.dishSnapshot.price)
-    }  ,0)
+    const { paidOrders, unpaidOrders } = useMemo(() => orders.reduce((result, order) => {
+        if (order.status === 'Paid') {
+            return {
+                ...result,
+                paidOrders: {
+                    price: result.paidOrders.price + order.quantity * order.dishSnapshot.price,
+                    quantity: result.paidOrders.quantity + order.quantity
+                }
+            };
+        } else if (order.status !== 'Rejected') {
+            return {
+                ...result,
+                unpaidOrders: {
+                    price: result.unpaidOrders.price + order.quantity * order.dishSnapshot.price,
+                    quantity: result.unpaidOrders.quantity + order.quantity
+                }
+            };
+        }
+        return result
+    }, {
+        paidOrders: {
+            price: 0,
+            quantity: 0
+        },
+        unpaidOrders: {
+            price: 0,
+            quantity: 0
+        }
+    }), [orders])
 
     useEffect(() => {
-        if(socket.connected){
+        if (socket.connected) {
             onConnect()
         }
-        if(socket.disconnected){
+        if (socket.disconnected) {
             onDisconnect()
         }
 
         function onConnect() {
-            console.log('Connected',socket.id)
+            console.log('Connected', socket.id)
         }
-        
+
         function onDisconnect() {
             console.log(socket.id, 'Disconnected')
         }
-    
-        function onUpdateOrder(data: UpdateOrderResType['data']){
+
+        function onUpdateOrder(data: UpdateOrderResType['data']) {
             toast.info(`Món ${data.dishSnapshot.name} (SL: ${data.quantity}) vừa đc cập nhật sang trạng thái ${data.status}`)
             router.refresh()
         }
-    
+
         socket.on('connect', onConnect);
         socket.on('disconnect', onDisconnect);
         socket.on('update-order', onUpdateOrder);
-    
+
         return () => {
-          socket.off('connect', onConnect);
-          socket.off('disconnect', onDisconnect);
-          socket.off('update-order', onUpdateOrder);
+            socket.off('connect', onConnect);
+            socket.off('disconnect', onDisconnect);
+            socket.off('update-order', onUpdateOrder);
         };
-      }, []);
+    }, []);
 
     return (
         <>
@@ -76,10 +102,16 @@ function GuestOrder({orders} : {orders: GuestGetOrdersResType['data']}) {
                     </div>
                 </div>
             ))}
+            {paidOrders.quantity > 0 && <div className='sticky bottom-0'>
+                <Button className='w-full justify-between' variant={'outline'}>
+                    <span>Đã thanh toán · {paidOrders.quantity} món</span>
+                    <span>{formatCurrency(paidOrders.price)}</span>
+                </Button>
+            </div>}
             <div className='sticky bottom-0'>
                 <Button className='w-full justify-between'>
-                    <span>Giỏ hàng · {orders.length} món</span>
-                    <span>{formatCurrency(totalPrice)}</span>
+                    <span>Đơn hàng · {unpaidOrders.quantity} món</span>
+                    <span>{formatCurrency(unpaidOrders.price)}</span>
                 </Button>
             </div>
         </>

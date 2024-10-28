@@ -15,17 +15,25 @@ import { Switch } from '@/components/ui/switch'
 import GuestsDialog from '@/app/manage/orders/guests-dialog'
 import { CreateOrdersBodyType } from '@/schemaValidations/order.schema'
 import Image from 'next/image'
-import { cn, formatCurrency } from '@/lib/utils'
+import { cn, formatCurrency, handleApiError } from '@/lib/utils'
 import { DishStatus } from '@/constants/type'
 import { DishListResType } from '@/schemaValidations/dish.schema'
 import Quantity from '@/app/(public)/guest/menu/quantity'
+import useGetDishes from '@/queries/useGetDishes'
+import { useAdminAddGuest, useAdminAddOrder } from './queries/useAdminOrder'
+import { toast } from 'sonner'
+import { Badge } from '@/components/ui/badge'
 
 export default function AddOrder() {
   const [open, setOpen] = useState(false)
   const [selectedGuest, setSelectedGuest] = useState<GetListGuestsResType['data'][0] | null>(null)
   const [isNewGuest, setIsNewGuest] = useState(true)
   const [orders, setOrders] = useState<CreateOrdersBodyType['orders']>([])
-  const dishes: DishListResType['data'] = []
+  const dataDishesQuery = useGetDishes()
+  const dishes: DishListResType['data'] = dataDishesQuery.data?.payload.data || []
+
+  const addGuestMutation = useAdminAddGuest()
+  const addOrderMutation = useAdminAddOrder()
 
   const totalPrice = useMemo(() => {
     return dishes.reduce((result, dish) => {
@@ -60,10 +68,37 @@ export default function AddOrder() {
     })
   }
 
-  const handleOrder = async () => {}
+  const handleOrder = async () => {
+    let guestId = selectedGuest?.id
+    try {
+      if (isNewGuest) {
+        const newGuestResp = await addGuestMutation.mutateAsync({ name, tableNumber })
+        guestId = newGuestResp.payload.data.id
+      }
+      if (!guestId) {
+        toast.warning('Vui lòng nhập chọn 1 khách hàng')
+        return
+      }
+      await addOrderMutation.mutateAsync({ guestId, orders })
+      resetDialog()
+    } catch (error) {
+      handleApiError(error, form.setError)
+    }
+  }
+
+  const resetDialog = () => {
+    form.reset()
+    setSelectedGuest(null)
+    setOpen(false)
+    setIsNewGuest(false)
+    setOrders([])
+  }
 
   return (
-    <Dialog onOpenChange={setOpen} open={open}>
+    <Dialog onOpenChange={value => {
+      if (!value) resetDialog()
+      setOpen(value)
+    }} open={open}>
       <DialogTrigger asChild>
         <Button size='sm' className='h-7 gap-1'>
           <PlusCircle className='h-3.5 w-3.5' />
@@ -148,7 +183,7 @@ export default function AddOrder() {
             <div
               key={dish.id}
               className={cn('flex gap-4', {
-                'pointer-events-none': dish.status === DishStatus.Unavailable
+                'pointer-events-none opacity-40': dish.status === DishStatus.Unavailable,
               })}
             >
               <div className='flex-shrink-0 relative'>
@@ -170,10 +205,13 @@ export default function AddOrder() {
                 <p className='text-xs font-semibold'>{formatCurrency(dish.price)}</p>
               </div>
               <div className='flex-shrink-0 ml-auto flex justify-center items-center'>
-                <Quantity
-                  onChange={(value) => handleQuantityChange(dish.id, value)}
-                  value={orders.find((order) => order.dishId === dish.id)?.quantity ?? 0}
-                />
+                {
+                  dish.status == DishStatus.Available ? <Quantity
+                    onChange={(value) => handleQuantityChange(dish.id, value)}
+                    value={orders.find((order) => order.dishId === dish.id)?.quantity ?? 0}
+                  />
+                    : <Badge variant={'secondary'}>Hết hàng</Badge>
+                }
               </div>
             </div>
           ))}

@@ -16,7 +16,7 @@ import { toast } from 'sonner'
 import { FormEvent, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import tableAPI from '@/apiRequests/table'
-import { useEditTable, useGetTables } from './queries/useTableQueries'
+import { useEditTable, useGetTableDetail } from './queries/useTableQueries'
 import TableQRCode from '@/components/table-qrcode'
 
 export default function EditTable({
@@ -38,7 +38,7 @@ export default function EditTable({
   })
   // const tableNumber = 0
 
-  const { data, isLoading } = useGetTables(id!)
+  const { data, isLoading } = useGetTableDetail(id!)
 
   useEffect(() => {
     if(data){

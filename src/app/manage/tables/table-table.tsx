@@ -43,7 +43,7 @@ import { getVietnameseTableStatus } from '@/lib/utils'
 import { TableListResType } from '@/schemaValidations/table.schema'
 import { useSearchParams } from 'next/navigation'
 import { createContext, useContext, useEffect, useState } from 'react'
-import { useDeleteTable, useGetTableDetail } from './queries/useTableQueries'
+import { useDeleteTable, useGetTables } from './queries/useTableQueries'
 
 type TableItem = TableListResType['data'][0]
 
@@ -172,7 +172,7 @@ export default function TableTable() {
     pageSize: PAGE_SIZE //default page size
   })
 
-  const dataQuery = useGetTableDetail()
+  const dataQuery = useGetTables()
   const data = dataQuery.data?.payload.data ?? []
 
   const table = useReactTable({

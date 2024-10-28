@@ -15,14 +15,14 @@ export const useAddTableMutation =  () => {
     })
 }
 
-export const useGetTables = (id: number) => {
+export const useGetTableDetail = (id: number) => {
     return useQuery({
         queryKey: ['getTableDetail', id],
         queryFn: () => tableAPI.getTableDetail(id),
         enabled: Boolean(id)
     })
 }
-export const useGetTableDetail = () => {
+export const useGetTables = () => {
     return useQuery({
         queryKey: ['tables-list'],
         queryFn: tableAPI.getTables,

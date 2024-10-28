@@ -34,7 +34,7 @@ import TableSkeleton from '@/app/manage/orders/table-skeleton'
 import { toast } from 'sonner'
 import { GuestCreateOrdersResType } from '@/schemaValidations/guest.schema'
 import { useAdminGetListOrder, useAdminUpdateOrderDetail } from './queries/useAdminOrder'
-import { useGetTableDetail } from '../tables/queries/useTableQueries'
+import { useGetTables } from '../tables/queries/useTableQueries'
 import { socket } from '@/lib/socket'
 
 export const OrderTableContext = createContext({
@@ -71,7 +71,7 @@ export default function OrderTable() {
   const [orderIdEdit, setOrderIdEdit] = useState<number | undefined>()
 
   const orderListQuery = useAdminGetListOrder({fromDate, toDate})
-  const tableListQuery = useGetTableDetail()
+  const tableListQuery = useGetTables()
   const orderList = orderListQuery.data?.payload.data ?? []
   const tableList = tableListQuery.data?.payload.data ?? []
   const updateOrderMutation = useAdminUpdateOrderDetail()

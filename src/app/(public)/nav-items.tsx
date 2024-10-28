@@ -39,7 +39,7 @@ export default function NavItems({ className }: { className?: string }) {
 
   const { isAuth: isSignedIn, role, setRole } = useAppContext()
   const pathname = usePathname()
-  const logoutMutation = useLogout()
+  const logoutMutation = useLogout(role)
   const router = useRouter()
 
   const handleLogout = async () => {

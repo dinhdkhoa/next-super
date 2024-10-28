@@ -61,7 +61,7 @@ export default function EditOrder({
       reset()
       onSubmitSuccess && onSubmitSuccess()
     } catch (error) {
-      handleApiError(error)
+      handleApiError(error, form.setError)
     }
   }
 

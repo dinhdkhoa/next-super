@@ -16,7 +16,7 @@ const orderAPI = {
     })),
     adminUpdateOrder:  (orderId: number, body: UpdateOrderBodyType) => http.put<UpdateOrderResType>(`/orders/${orderId}`, body),
     adminGetOrderDetail:  (orderId: number) => http.get<GetOrderDetailResType>(`/orders/${orderId}`),
-    adminPayTable:  (body: PayGuestOrdersBodyType) => http.post<PayGuestOrdersResType>(`/pay`, body),
+    adminPayTable:  (body: PayGuestOrdersBodyType) => http.post<PayGuestOrdersResType>(`/orders/pay`, body),
 }
 
 export default orderAPI

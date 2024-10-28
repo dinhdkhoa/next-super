@@ -325,6 +325,11 @@ const OrderTableSocket = ({toDate, refetch} : {toDate: Date, refetch : any}) => 
       refetchOrderList()
     }
 
+    function onPayment(data: PayGuestOrdersResType['data']) {
+      toast.info(`Thanh toán thành công cho khách ${data[0].guest?.name} bàn ${data[0]?.tableNumber}`)
+      refetchOrderList()
+    }
+
     function onUpdateOrder(data: UpdateOrderResType['data']){
         toast.info(`Món ${data.dishSnapshot.name} (SL: ${data.quantity}) vừa đc cập nhật sang trạng thái ${data.status}`)
         refetchOrderList()
@@ -334,12 +339,14 @@ const OrderTableSocket = ({toDate, refetch} : {toDate: Date, refetch : any}) => 
     socket.on('disconnect', onDisconnect);
     socket.on('new-order', onNewOrder);
     socket.on('update-order', onUpdateOrder);
+    socket.on('payment', onPayment);
 
     return () => {
       socket.off('connect', onConnect);
       socket.off('disconnect', onDisconnect);
       socket.off('update-order', onUpdateOrder);
       socket.off('new-order', onNewOrder);
+      socket.off('payment', onPayment);
     };
   }, []);
   return null

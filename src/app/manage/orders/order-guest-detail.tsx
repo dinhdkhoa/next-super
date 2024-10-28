@@ -6,19 +6,32 @@ import {
   formatCurrency,
   formatDateTimeToLocaleString,
   formatDateTimeToTimeString,
-  getVietnameseOrderStatus
+  getVietnameseOrderStatus,
+  handleApiError
 } from '@/lib/utils'
 import { GetOrdersResType } from '@/schemaValidations/order.schema'
 import Image from 'next/image'
 import { Fragment } from 'react'
+import { useAdminPayTable } from './queries/useAdminOrder'
 
 type Guest = GetOrdersResType['data'][0]['guest']
 type Orders = GetOrdersResType['data']
-export default function OrderGuestDetail({ guest, orders }: { guest: Guest; orders: Orders }) {
+export default function OrderGuestDetail({ guest, orders, onPaymentSuccess }: { guest: Guest; orders: Orders , onPaymentSuccess?: () => void}) {
   const ordersFilterToPurchase = guest
     ? orders.filter((order) => order.status !== OrderStatus.Paid && order.status !== OrderStatus.Rejected)
     : []
   const purchasedOrderFilter = guest ? orders.filter((order) => order.status === OrderStatus.Paid) : []
+  const payTableMutation = useAdminPayTable()
+
+  const handlePay = async () => {
+    if (payTableMutation.isPending || !guest) return
+    try {
+      await payTableMutation.mutateAsync({guestId: guest.id})
+      onPaymentSuccess && onPaymentSuccess()
+    } catch (error) {
+      handleApiError(error)
+    }
+  }
   return (
     <div className='space-y-2 text-sm'>
       {guest && (
@@ -115,7 +128,7 @@ export default function OrderGuestDetail({ guest, orders }: { guest: Guest; orde
       </div>
 
       <div>
-        <Button className='w-full' size={'sm'} variant={'secondary'} disabled={ordersFilterToPurchase.length === 0}>
+        <Button className='w-full' size={'sm'} variant={'secondary'} disabled={ordersFilterToPurchase.length === 0 || payTableMutation.isPending} onClick={handlePay}>
           Thanh toán tất cả ({ordersFilterToPurchase.length} đơn)
         </Button>
       </div>

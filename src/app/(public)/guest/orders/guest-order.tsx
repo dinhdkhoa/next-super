@@ -11,7 +11,7 @@ import { DishStatus } from '@/constants/type'
 import { Badge } from '@/components/ui/badge'
 import { socket } from '@/lib/socket'
 import { useRouter } from 'next/navigation'
-import { UpdateOrderResType } from '@/schemaValidations/order.schema'
+import { PayGuestOrdersResType, UpdateOrderResType } from '@/schemaValidations/order.schema'
 import { toast } from 'sonner'
 
 function GuestOrder({ orders }: { orders: GuestGetOrdersResType['data'] }) {
@@ -61,6 +61,10 @@ function GuestOrder({ orders }: { orders: GuestGetOrdersResType['data'] }) {
         function onDisconnect() {
             console.log(socket.id, 'Disconnected')
         }
+        function onPayment(data: PayGuestOrdersResType['data']) {
+            toast.info(`Thanh toán thành công ${data.length} đơn hàng!`)
+            router.refresh()
+        }
 
         function onUpdateOrder(data: UpdateOrderResType['data']) {
             toast.info(`Món ${data.dishSnapshot.name} (SL: ${data.quantity}) vừa đc cập nhật sang trạng thái ${data.status}`)
@@ -70,11 +74,13 @@ function GuestOrder({ orders }: { orders: GuestGetOrdersResType['data'] }) {
         socket.on('connect', onConnect);
         socket.on('disconnect', onDisconnect);
         socket.on('update-order', onUpdateOrder);
+        socket.on('payment', onPayment);
 
         return () => {
             socket.off('connect', onConnect);
             socket.off('disconnect', onDisconnect);
             socket.off('update-order', onUpdateOrder);
+            socket.off('payment', onPayment);
         };
     }, []);
 

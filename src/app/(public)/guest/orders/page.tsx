@@ -7,7 +7,7 @@ import { cookies } from 'next/headers'
 export default async function GuestOrderPage() {
   let orders : GuestGetOrdersResType['data'] = []
   try {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const token = cookieStore.get('accessToken')
     const data = await orderAPI.guestGetOrder(token?.value)
     orders = data.payload.data

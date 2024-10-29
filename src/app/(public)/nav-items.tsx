@@ -6,7 +6,7 @@ import { checkPathName, isEmployeePath } from '@/constants/route-middleware'
 import { Role } from '@/constants/type'
 import StorageService from '@/lib/storage'
 import { handleApiError } from '@/lib/utils'
-import useLogout from '@/queries/useLogout'
+import useLogout, { useLogoutGuest } from '@/queries/useLogout'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/navigation'
@@ -39,19 +39,29 @@ export default function NavItems({ className }: { className?: string }) {
 
   const { isAuth: isSignedIn, role, setRole } = useAppContext()
   const pathname = usePathname()
-  const logoutMutation = useLogout(role)
+  const logoutMutation = useLogout()
+  const logoutGuestMutation = useLogoutGuest()
   const router = useRouter()
 
   const handleLogout = async () => {
     if(logoutMutation.isPending) return 
 
     try {
-      await logoutMutation.mutate(null as any, {
-        onSuccess() {
-           setRole()
-           router.push('/')
-        },
-      })
+      if(role == 'Guest') {
+        await logoutGuestMutation.mutate(null as any, {
+          onSuccess() {
+             setRole()
+             router.push('/')
+          },
+        })
+      } else {
+        await logoutMutation.mutate(null as any, {
+          onSuccess() {
+             setRole()
+             router.push('/')
+          },
+        })
+      }
     } catch (error) {
       handleApiError(error)
     }

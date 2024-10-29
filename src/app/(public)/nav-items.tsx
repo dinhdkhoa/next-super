@@ -2,15 +2,13 @@
 
 import { useAppContext } from '@/components/app-provider'
 import { Button } from '@/components/ui/button'
-import { checkPathName, isEmployeePath } from '@/constants/route-middleware'
+import { checkPathName } from '@/constants/route-middleware'
 import { Role } from '@/constants/type'
-import StorageService from '@/lib/storage'
 import { handleApiError } from '@/lib/utils'
 import useLogout, { useLogoutGuest } from '@/queries/useLogout'
+import { RoleType } from '@/types/jwt.types'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
 
 const menuItems = [
   {
@@ -39,33 +37,6 @@ export default function NavItems({ className }: { className?: string }) {
 
   const { isAuth: isSignedIn, role, setRole } = useAppContext()
   const pathname = usePathname()
-  const logoutMutation = useLogout()
-  const logoutGuestMutation = useLogoutGuest()
-  const router = useRouter()
-
-  const handleLogout = async () => {
-    if(logoutMutation.isPending) return 
-
-    try {
-      if(role == 'Guest') {
-        await logoutGuestMutation.mutate(null as any, {
-          onSuccess() {
-             setRole()
-             router.push('/')
-          },
-        })
-      } else {
-        await logoutMutation.mutate(null as any, {
-          onSuccess() {
-             setRole()
-             router.push('/')
-          },
-        })
-      }
-    } catch (error) {
-      handleApiError(error)
-    }
-  }
 
   const { isGuestPath, isEmployeePath } = checkPathName(pathname)
 
@@ -85,16 +56,48 @@ export default function NavItems({ className }: { className?: string }) {
   })
 
   return <>
-    {menuItemsFiltered.map((item) => {
+    {menuItemsFiltered.map((item, i) => {
       return (
-        <Link href={item.href} key={item.href} className={className}>
+        <Link href={item.href} key={i} className={className}>
           {item.title}
         </Link>
       )
     })}
-    <Button variant='link' className='hover:no-underline p-0 text-muted-foreground' onClick={handleLogout}>
-      Đăng xuất
-    </Button>
+    <NavLogoutButton role={role} setRole={setRole}/>
   </>
 }
 
+const NavLogoutButton = ({role, setRole} : {role: RoleType, setRole: (role?: RoleType) => void}) => {
+
+  const logoutMutation = useLogout()
+  const logoutGuestMutation = useLogoutGuest()
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    if (logoutMutation.isPending) return
+
+    try {
+      if (role == 'Guest') {
+        await logoutGuestMutation.mutate(null as any, {
+          onSuccess() {
+            setRole()
+            router.push('/')
+          },
+        })
+      } else {
+        await logoutMutation.mutate(null as any, {
+          onSuccess() {
+            setRole()
+            router.push('/')
+          },
+        })
+      }
+    } catch (error) {
+      handleApiError(error)
+    }
+  }
+
+  return <Button variant='link' className='hover:no-underline p-0 text-muted-foreground' onClick={handleLogout}>
+    Đăng xuất
+  </Button>
+}

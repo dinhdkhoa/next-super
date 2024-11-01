@@ -4,15 +4,17 @@ import { useAppContext } from "@/components/app-provider"
 import { RoleType } from "@/types/jwt.types"
 import { useMutation } from "@tanstack/react-query"
 
-const useLogout = (role?: RoleType) => {
-  if(role == 'Guest') {
-    return useMutation({
-      mutationFn: guestAPI.logoutClient
-    })
-  }
+const useLogout = () => {
   return useMutation({
     mutationFn: authAPI.logoutClient
   })
 }
+
+export const useLogoutGuest = () => {
+  return useMutation({
+    mutationFn: guestAPI.logoutClient
+  })
+}
+
 export default useLogout
 

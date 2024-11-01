@@ -15,6 +15,7 @@ const RefreshTokenComponent = () => {
   const returnUrl = params.get("returnUrl")
   const { setRole } = useAppContext()
   useEffect(() => {
+    console.log(checkPathName(pathname).isPublicPath, 'checkPathName(pathname).isPublicPath ')
     if(checkPathName(pathname).isPublicPath || checkPathName(pathname).isAuthPath) return
     if (
       !refreshToken ||

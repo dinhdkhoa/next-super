@@ -63,6 +63,7 @@ export async function checkAndRefreshToken(onSuccess?: () => void, onError?: () 
   if (accessTokenValidTimeLeft < accessTokenDuration / 3) {
     try {
       const role = decodedRT.role
+      console.log('first')
       if(role !== Role.Guest){
         await authAPI.refreshTokenClient()
       } else {

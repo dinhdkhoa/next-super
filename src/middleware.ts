@@ -8,7 +8,7 @@ import { TokenPayload } from './types/jwt.types';
 export function middleware(request: NextRequest) {
     const {pathname} = request.nextUrl
 
-    const {isAuthPath,isEmployeePath, isGuestPath,isPrivatePath, isPublicPath} = checkPathName(pathname)
+    const {isAuthPath,isEmployeePath, isGuestPath,isPrivatePath, isPublicPath, isAuthAPIPath} = checkPathName(pathname)
     
     if(isPublicPath) return NextResponse.next()
 
@@ -31,6 +31,11 @@ export function middleware(request: NextRequest) {
         redirectUrl.searchParams.set('rt', request.cookies.get('refreshToken')?.value || '')
         redirectUrl.searchParams.set('returnUrl',pathname)
         return NextResponse.redirect(redirectUrl)
+    }
+
+    // console.log(pathname)
+    if(!isAccessTokenValid && isAuthAPIPath){
+        return NextResponse.next()
     }
 
     //Refresh Token,access token Valid nhưng cố vào AuthPath

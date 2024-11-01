@@ -1,4 +1,5 @@
 const authPaths = ['/login', '/register', '/tables']
+const authAPIPaths = ['/refresh-token', '/logout']
 const guestPaths = ['/guest']
 const employeePaths = ['/manage']
 const privatePath = [...guestPaths, ...employeePaths]
@@ -15,9 +16,12 @@ const isAuthPath = (pathName: string) => {
 const isPrivatePath = (pathName: string) => {
     return privatePath.some(path => pathName.startsWith(path))
 } 
+const isAuthAPIPath = (pathName: string) => {
+    return authAPIPaths.some(path => pathName.startsWith(path))
+} 
 
 const isPublicPath = (pathName: string) => {
-    return( pathName === '/' || (!isPrivatePath(pathName) && !isAuthPath(pathName))) && pathName !== '/refresh-token' && pathName !== '/logout'
+    return( pathName === '/' || (!isPrivatePath(pathName) && !isAuthPath(pathName))) && !isAuthAPIPath(pathName)
 } 
 
 const checkPathName = (pathName: string) => {
@@ -27,6 +31,7 @@ const checkPathName = (pathName: string) => {
         isAuthPath: isAuthPath(pathName),
         isGuestPath: isGuestPath(pathName),
         isEmployeePath: isEmployeePath(pathName),
+        isAuthAPIPath: isAuthAPIPath(pathName),
     }
 }
 
@@ -36,5 +41,6 @@ export {
     isAuthPath,
     isPrivatePath,
     isPublicPath,
-    checkPathName
+    checkPathName,
+    isAuthAPIPath
 };

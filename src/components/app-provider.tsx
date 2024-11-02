@@ -23,8 +23,8 @@ const AppContext = createContext<{
 export const useAppContext = () => useContext(AppContext)
 
 export default function AppProvider({children} : {children: ReactNode}) {
-
-const [role, setRoleState] = useState<RoleType | undefined>(undefined)
+  const [role, setRoleState] = useState<RoleType | undefined>(undefined)
+  console.log(role)
 
 useEffect(() => {
   const accessToken = StorageService.getAccessToken()

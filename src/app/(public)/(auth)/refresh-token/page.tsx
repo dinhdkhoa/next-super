@@ -15,20 +15,24 @@ const RefreshTokenComponent = () => {
   const returnUrl = params.get("returnUrl")
   const { setRole } = useAppContext()
   useEffect(() => {
-    console.log(checkPathName(pathname).isPublicPath, 'checkPathName(pathname).isPublicPath ')
-    if(checkPathName(pathname).isPublicPath || checkPathName(pathname).isAuthPath) return
+    if (checkPathName(pathname).isPublicPath || checkPathName(pathname).isAuthPath) return
     if (
       !refreshToken ||
       refreshToken !== StorageService.getRefreshToken()
     ) {
       router.push("/login")
+      console.log('case1')
       setRole()
     } else {
+      StorageService.setAccessToken('')
       checkAndRefreshToken(() => {
         router.push(returnUrl || '/manage/setting')
+      }, () => {
+      console.log('case2')
+        setRole()
       })
     }
-  }, [pathname, router])
+  }, [pathname, router, returnUrl])
   return (
     <div>Getting Token</div>
   )

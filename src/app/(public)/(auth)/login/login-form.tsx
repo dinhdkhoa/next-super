@@ -65,6 +65,7 @@ export default function LoginForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
+        <fieldset className='group' disabled={loginMutation.isPending || loginMutation.isSuccess}>
           <form
             className="space-y-2 max-w-[600px] flex-shrink-0 w-full"
             noValidate
@@ -119,6 +120,7 @@ export default function LoginForm() {
               </Button>
             </div>
           </form>
+        </fieldset>
         </Form>
       </CardContent>
     </Card>

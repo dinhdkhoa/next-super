@@ -44,6 +44,7 @@ export async function checkAndRefreshToken(onSuccess?: () => void, onError?: () 
   const accessToken = StorageService.getAccessToken()
 
   if (!refreshToken){
+    authAPI.logoutClient()
     return onError && onError()
   }
 
@@ -63,7 +64,6 @@ export async function checkAndRefreshToken(onSuccess?: () => void, onError?: () 
   if (accessTokenValidTimeLeft < accessTokenDuration / 3) {
     try {
       const role = decodedRT.role
-      console.log('first')
       if(role !== Role.Guest){
         await authAPI.refreshTokenClient()
       } else {

@@ -159,7 +159,7 @@ const handleUnthorizedResponseOnClient = async (baseHeader: HeadersInit | undefi
         let role : RoleType | null = null
         const accessToken = StorageService.getAccessToken()
         if(accessToken) role = (jwt.decode(accessToken) as TokenPayload).role
-        const logoutURL = role == Role.Guest ? 'api/guest/auth/logout' : 'api/auth/logout'
+        const logoutURL = (accessToken && role == Role.Guest) ? '/api/guest/auth/logout' : '/api/auth/logout'
 
         await fetch(logoutURL, 
             {
@@ -172,7 +172,6 @@ const handleUnthorizedResponseOnClient = async (baseHeader: HeadersInit | undefi
         )
         // clientSessionToken.value = '';
         // clientSessionToken.expiresAt = '';
-        StorageService.removeTokens()
         location.href = '/login?sessionExpired=true'
 }
 

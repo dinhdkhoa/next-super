@@ -4,7 +4,7 @@ import queryString from 'query-string';
 
 const indicatorsAPI = {
 
-    getDashboardData:  (queryParams: DashboardIndicatorQueryParamsType) => http.get<DashboardIndicatorResType>('indicators/dashboard/?' + queryString.stringify({
+    getDashboardData:  (queryParams: DashboardIndicatorQueryParamsType) => http.get<DashboardIndicatorResType>('indicators/dashboard?' + queryString.stringify({
         fromDate: queryParams.fromDate?.toISOString(),
         toDate: queryParams.toDate?.toISOString()
     })),

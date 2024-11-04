@@ -15,7 +15,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Upload } from 'lucide-react'
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Switch } from '@/components/ui/switch'
 import { useMutation, useQuery } from '@tanstack/react-query'
@@ -23,6 +23,8 @@ import accountAPI from '@/apiRequests/account'
 import mediaAPI from '@/apiRequests/media'
 import { toast } from 'sonner'
 import { handleApiError } from '@/lib/utils'
+import { Role, RoleValues } from '@/constants/type'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 export default function EditEmployee({
   id,
@@ -54,7 +56,8 @@ export default function EditEmployee({
       avatar: undefined,
       password: undefined,
       confirmPassword: undefined,
-      changePassword: false
+      changePassword: false,
+      role: Role.Employee
     }
   })
   const avatar = form.watch('avatar')
@@ -69,7 +72,7 @@ export default function EditEmployee({
 
   useEffect(() => {
     if(data){
-      const { avatar, name , email} = data.payload.data
+      const { avatar, name , email, role} = data.payload.data
       form.reset({
         avatar: avatar ?? form.getValues('avatar'),
         name,
@@ -77,6 +80,7 @@ export default function EditEmployee({
         password: form.getValues('password'),
         confirmPassword: form.getValues('confirmPassword'),
         changePassword: form.getValues('changePassword'),
+        role: role ?? Role.Employee
       })
     }
   }, [data, form])
@@ -187,6 +191,33 @@ export default function EditEmployee({
                         <Input id='email' className='w-full' {...field} />
                         <FormMessage />
                       </div>
+                    </div>
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='role'
+                render={({ field }) => (
+                  <FormItem>
+                    <div className='grid grid-cols-4 items-center justify-items-start gap-4'>
+                      <Label htmlFor='description'>Vai trò</Label>
+                      <div className='col-span-3 w-full space-y-2'>
+                        <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder='Chọn vai trò' />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {RoleValues.filter((role) => role !== Role.Guest).map((role) => (
+                              <SelectItem key={role} value={role}>{role}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <FormMessage />
                     </div>
                   </FormItem>
                 )}

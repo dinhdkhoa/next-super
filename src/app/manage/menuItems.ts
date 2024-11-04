@@ -22,11 +22,11 @@ const menuItems = [
     href: '/manage/dishes'
   },
 
-  {
-    title: 'Phân tích',
-    Icon: LineChart,
-    href: '/manage/analytics'
-  },
+  // {
+  //   title: 'Phân tích',
+  //   Icon: LineChart,
+  //   href: '/manage/analytics'
+  // },
   {
     title: 'Nhân viên',
     Icon: Users2,

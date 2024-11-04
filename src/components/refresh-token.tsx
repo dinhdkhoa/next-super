@@ -32,9 +32,9 @@ function RefreshToken() {
             console.log(socket.id, 'Disconnected')
         }
 
-        function onRefreshToken(data: any) {
-            console.log(data)
+        function onRefreshToken() {
             onCheckandRefreshToken(true)
+            window.location.reload()    
         }
 
         socket.on('connect', onConnect);

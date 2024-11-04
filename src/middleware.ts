@@ -12,7 +12,6 @@ export function middleware(request: NextRequest) {
     
     if(isPublicPath) return NextResponse.next()
 
-        console.log('isPublicPath', pathname)
     const accessToken = request.cookies.get('accessToken')
     const refreshToken = request.cookies.get('refreshToken')
 

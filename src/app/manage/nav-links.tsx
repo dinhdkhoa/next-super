@@ -24,7 +24,7 @@ export default function NavLinks() {
           </Link>
 
           {menuItems.map((Item, index) => {
-            if(role != 'Owner' && Item.isOwner && Item.isOwner == true) return null
+            if (role !== 'Owner' && Item.isOwner) return null;
             const isActive = pathname === Item.href
             return (
               <Tooltip key={index}>

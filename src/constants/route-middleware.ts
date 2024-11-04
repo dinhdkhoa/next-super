@@ -2,13 +2,14 @@ const authPaths = ['/login', '/register', '/tables']
 const authAPIPaths = ['/refresh-token', '/logout']
 const guestPaths = ['/guest']
 const employeePaths = ['/manage']
+const ownerPaths = ['/manage/accounts']
 const privatePath = [...guestPaths, ...employeePaths]
 
 const isGuestPath = (pathName: string) => {
     return guestPaths.some(path => pathName.startsWith(path))
 } 
 const isEmployeePath = (pathName: string) => {
-    return employeePaths.some(path => pathName.startsWith(path))
+    return employeePaths.some(path => pathName.startsWith(path)) && ownerPaths.every(path => path !== pathName)
 } 
 const isAuthPath = (pathName: string) => {
     return authPaths.some(path => pathName.startsWith(path))

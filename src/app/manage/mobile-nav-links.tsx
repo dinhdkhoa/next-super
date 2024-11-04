@@ -11,7 +11,6 @@ import { usePathname } from 'next/navigation'
 export default function MobileNavLinks() {
   const pathname = usePathname()
   const { role } = useAppContext()
-  console.log(role)
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -30,7 +29,7 @@ export default function MobileNavLinks() {
             <span className='sr-only'>Acme Inc</span>
           </Link>
           {menuItems.map((Item, index) => {
-            if(role != 'Owner' && Item.isOwner && Item.isOwner == true) return null
+            if (role !== 'Owner' && Item.isOwner) return null;
             const isActive = pathname === Item.href
             return (
               <Link

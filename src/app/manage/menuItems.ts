@@ -4,7 +4,7 @@ const menuItems = [
   {
     title: 'Dashboard',
     Icon: Home,
-    href: '/manage/dashboard'
+    href: '/manage/dashboard',
   },
   {
     title: 'Đơn hàng',
@@ -30,7 +30,8 @@ const menuItems = [
   {
     title: 'Nhân viên',
     Icon: Users2,
-    href: '/manage/accounts'
+    href: '/manage/accounts',
+    isOwner: true
   }
 ]
 

@@ -36,8 +36,7 @@ useEffect(() => {
 const setRole = useCallback((role?: RoleType) => {
   if(role) {
     setRoleState(role)
-  } else {
-    setRoleState(undefined)
+  } else {  
     StorageService.removeTokens()
   }
 }, [])

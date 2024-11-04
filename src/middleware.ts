@@ -48,6 +48,7 @@ export function middleware(request: NextRequest) {
 
     if(role == 'Guest' && !isGuestPath) return NextResponse.redirect(new URL('/', request.url))
     if(role !== 'Guest' && isGuestPath) return NextResponse.redirect(new URL('/manage/dashboard', request.url))
+    if(role == 'Employee' && !isEmployeePath) return NextResponse.redirect(new URL('/manage/dashboard', request.url))
 
     return NextResponse.next()
 }

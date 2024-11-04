@@ -1,5 +1,6 @@
 'use client'
 import menuItems from '@/app/manage/menuItems'
+import { useAppContext } from '@/components/app-provider'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import { cn } from '@/lib/utils'
@@ -9,6 +10,7 @@ import { usePathname } from 'next/navigation'
 
 export default function MobileNavLinks() {
   const pathname = usePathname()
+  const { role } = useAppContext()
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -27,6 +29,7 @@ export default function MobileNavLinks() {
             <span className='sr-only'>Acme Inc</span>
           </Link>
           {menuItems.map((Item, index) => {
+            if (role !== 'Owner' && Item.isOwner) return null;
             const isActive = pathname === Item.href
             return (
               <Link

@@ -39,7 +39,7 @@ export const handleApiError = (error: unknown, setError?: UseFormSetError<any>, 
 
 export const isClient = typeof window !== 'undefined'
 
-export async function checkAndRefreshToken(onSuccess?: () => void, onError?: () => void) {
+export async function checkAndRefreshToken(onSuccess?: () => void, onError?: () => void, force?: boolean) {
   const refreshToken = StorageService.getRefreshToken()
   const accessToken = StorageService.getAccessToken()
 
@@ -61,7 +61,7 @@ export async function checkAndRefreshToken(onSuccess?: () => void, onError?: () 
   const accessTokenDuration = decodedAT.exp - decodedAT.iat
   const accessTokenValidTimeLeft = decodedAT.exp - now
 
-  if (accessTokenValidTimeLeft < accessTokenDuration / 3) {
+  if ((accessTokenValidTimeLeft < accessTokenDuration / 3) || force) {
     try {
       const role = decodedRT.role
       if(role !== Role.Guest){

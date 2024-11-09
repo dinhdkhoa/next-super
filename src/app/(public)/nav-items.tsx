@@ -4,6 +4,7 @@ import { useAppContext } from '@/components/app-provider'
 import { Button } from '@/components/ui/button'
 import { checkPathName } from '@/constants/route-middleware'
 import { Role } from '@/constants/type'
+import { socket } from '@/lib/socket'
 import { handleApiError } from '@/lib/utils'
 import useLogout, { useLogoutGuest } from '@/queries/useLogout'
 import { RoleType } from '@/types/jwt.types'
@@ -74,26 +75,20 @@ const NavLogoutButton = ({role, setRole} : {role: RoleType, setRole: (role?: Rol
   const router = useRouter()
 
   const handleLogout = async () => {
-    if (logoutMutation.isPending) return
+    if (logoutMutation.isPending) return;
+
+    const onSuccess = () => {
+      setRole();
+      router.push('/');
+      socket.disconnect();
+    };
+
+    const mutation = role === 'Guest' ? logoutGuestMutation : logoutMutation;
 
     try {
-      if (role == 'Guest') {
-        await logoutGuestMutation.mutate(null as any, {
-          onSuccess() {
-            setRole()
-            router.push('/')
-          },
-        })
-      } else {
-        await logoutMutation.mutate(null as any, {
-          onSuccess() {
-            setRole()
-            router.push('/')
-          },
-        })
-      }
+      await mutation.mutate(null as any, { onSuccess });
     } catch (error) {
-      handleApiError(error)
+      handleApiError(error);
     }
   }
 

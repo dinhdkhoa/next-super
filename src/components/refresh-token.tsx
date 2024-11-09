@@ -1,6 +1,7 @@
 'use client'
 
 import { checkPathName } from "@/constants/route-middleware"
+import { SocketEventListener } from "@/constants/socket"
 import { socket } from "@/lib/socket"
 import { checkAndRefreshToken } from "@/lib/utils"
 import { usePathname, useRouter } from "next/navigation"
@@ -23,28 +24,15 @@ function RefreshToken() {
 
         interval = setInterval(onCheckandRefreshToken, CHECK_VALID_TOKEN_INTERVAL)
 
-
-        function onConnect() {
-            console.log('Connected', socket.id)
-        }
-
-        function onDisconnect() {
-            console.log(socket.id, 'Disconnected')
-        }
-
         function onRefreshToken() {
             onCheckandRefreshToken(true)
             window.location.reload()    
         }
 
-        socket.on('connect', onConnect);
-        socket.on('disconnect', onDisconnect);
-        socket.on('refresh-token', onRefreshToken);
+        socket.on(SocketEventListener.RefreshToken, onRefreshToken);
 
         return () => {
-            socket.off('connect', onConnect);
-            socket.off('disconnect', onDisconnect);
-            socket.off('refresh-token', onRefreshToken);
+            socket.off(SocketEventListener.RefreshToken, onRefreshToken);
             clearInterval(interval)
         }
     }, [pathname, router])

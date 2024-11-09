@@ -14,6 +14,7 @@ import { handleApiError } from '@/lib/utils'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAppContext } from '@/components/app-provider'
 import { useEffect } from 'react'
+import { socket } from '@/lib/socket'
 
 
 export default function LoginForm() {
@@ -36,6 +37,7 @@ export default function LoginForm() {
         toast.success(data.payload.message)
         setRole(data.payload.data.account.role)
         router.push(returnUrl ??'/manage/dashboard')
+        socket.connect()
       },
       onError(error, variables, context) {
         handleApiError(error, form.setError)

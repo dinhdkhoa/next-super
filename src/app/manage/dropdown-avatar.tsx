@@ -18,6 +18,7 @@ import accountAPI from '@/apiRequests/account'
 import useGetAccount from '@/queries/useGetAccount'
 import useLogout from '@/queries/useLogout'
 import { useAppContext } from '@/components/app-provider'
+import { socket } from '@/lib/socket'
 
 
 export default function DropdownAvatar() {
@@ -37,6 +38,7 @@ export default function DropdownAvatar() {
         onSuccess(data, variables, context) {
            router.push("/login")
            setRole()
+           socket.disconnect()
         },
       })
     } catch (error) {

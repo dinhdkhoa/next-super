@@ -13,6 +13,7 @@ import { socket } from '@/lib/socket'
 import { useRouter } from 'next/navigation'
 import { PayGuestOrdersResType, UpdateOrderResType } from '@/schemaValidations/order.schema'
 import { toast } from 'sonner'
+import { SocketEventListener } from '@/constants/socket'
 
 function GuestOrder({ orders }: { orders: GuestGetOrdersResType['data'] }) {
     const router = useRouter()
@@ -47,20 +48,7 @@ function GuestOrder({ orders }: { orders: GuestGetOrdersResType['data'] }) {
     }), [orders])
 
     useEffect(() => {
-        if (socket.connected) {
-            onConnect()
-        }
-        if (socket.disconnected) {
-            onDisconnect()
-        }
-
-        function onConnect() {
-            console.log('Connected', socket.id)
-        }
-
-        function onDisconnect() {
-            console.log(socket.id, 'Disconnected')
-        }
+  
         function onPayment(data: PayGuestOrdersResType['data']) {
             toast.info(`Thanh toán thành công ${data.length} đơn hàng!`)
             router.refresh()
@@ -71,16 +59,12 @@ function GuestOrder({ orders }: { orders: GuestGetOrdersResType['data'] }) {
             router.refresh()
         }
 
-        socket.on('connect', onConnect);
-        socket.on('disconnect', onDisconnect);
-        socket.on('update-order', onUpdateOrder);
-        socket.on('payment', onPayment);
+        socket.on(SocketEventListener.UpdateOrder, onUpdateOrder);
+        socket.on(SocketEventListener.Payment, onPayment);
 
         return () => {
-            socket.off('connect', onConnect);
-            socket.off('disconnect', onDisconnect);
-            socket.off('update-order', onUpdateOrder);
-            socket.off('payment', onPayment);
+            socket.off(SocketEventListener.UpdateOrder, onUpdateOrder);
+            socket.off(SocketEventListener.Payment, onPayment);
         };
     }, []);
 

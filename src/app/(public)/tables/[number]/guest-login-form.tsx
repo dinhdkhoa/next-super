@@ -13,6 +13,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { useGuestLoginMutation } from './queries/useGuestAuthQueries'
 import { useEffect } from 'react'
+import { socket } from '@/lib/socket'
 
 export default function GuestLoginForm() {
   const {setRole} = useAppContext()
@@ -43,7 +44,9 @@ export default function GuestLoginForm() {
       onSuccess: (data) => {
         toast.success(data.payload.message)
         setRole(data.payload.data.guest.role)
-        router.push('/guest/menu')},
+        router.push('/guest/menu')
+        socket.connect()
+      },
       onError(error) {
         handleApiError(error, form.setError)
       },

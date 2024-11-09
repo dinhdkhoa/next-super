@@ -36,6 +36,7 @@ import { GuestCreateOrdersResType } from '@/schemaValidations/guest.schema'
 import { useAdminGetListOrder, useAdminUpdateOrderDetail } from './queries/useAdminOrder'
 import { useGetTables } from '../tables/queries/useTableQueries'
 import { socket } from '@/lib/socket'
+import { SocketEventListener } from '@/constants/socket'
 
 export const OrderTableContext = createContext({
   setOrderIdEdit: (value: number | undefined) => {},
@@ -301,24 +302,10 @@ export default function OrderTable() {
 
 const OrderTableSocket = ({toDate, refetch} : {toDate: Date, refetch : any}) => {
   useEffect(() => {
-    if(socket.connected){
-        onConnect()
-    }
-    if(socket.disconnected){
-        onDisconnect()
-    }
-
     function refetchOrderList(){
       if(toDate.toDateString() == new Date().toDateString()) refetch()
     }
 
-    function onConnect() {
-        console.log('Connected',socket.id)
-    }
-    
-    function onDisconnect() {
-        console.log(socket.id, 'Disconnected')
-    }
     function onNewOrder(data: GuestCreateOrdersResType['data']) {
       const {guest } = data[0]
       toast.info(`${guest?.name} tại bàn ${guest?.tableNumber} vừa đặt ${data.length} đơn`)
@@ -335,18 +322,14 @@ const OrderTableSocket = ({toDate, refetch} : {toDate: Date, refetch : any}) => 
         refetchOrderList()
     }
 
-    socket.on('connect', onConnect);
-    socket.on('disconnect', onDisconnect);
-    socket.on('new-order', onNewOrder);
-    socket.on('update-order', onUpdateOrder);
-    socket.on('payment', onPayment);
+    socket.on(SocketEventListener.NewOrder, onNewOrder);
+    socket.on(SocketEventListener.UpdateOrder, onUpdateOrder);
+    socket.on(SocketEventListener.Payment, onPayment);
 
     return () => {
-      socket.off('connect', onConnect);
-      socket.off('disconnect', onDisconnect);
-      socket.off('update-order', onUpdateOrder);
-      socket.off('new-order', onNewOrder);
-      socket.off('payment', onPayment);
+      socket.off(SocketEventListener.UpdateOrder, onUpdateOrder);
+      socket.off(SocketEventListener.NewOrder, onNewOrder);
+      socket.off(SocketEventListener.Payment, onPayment);
     };
   }, []);
   return null

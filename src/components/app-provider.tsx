@@ -8,6 +8,7 @@ import { createContext, ReactNode, useCallback, useContext, useEffect, useState 
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { RoleType, TokenPayload } from "@/types/jwt.types"
 import jwt from 'jsonwebtoken'
+import { socket } from "@/lib/socket"
 
 
 const AppContext = createContext<{
@@ -30,7 +31,14 @@ useEffect(() => {
   if(accessToken){
     const jwtInfo = jwt.decode(accessToken) as TokenPayload
     setRoleState(jwtInfo.role)
+    if(!socket.isConnected){
+      socket.connect()
+    }
   } 
+  return () => {
+    console.log('cleanup')
+    socket.disconnect();
+  };
 },[])
 
 const setRole = useCallback((role?: RoleType) => {

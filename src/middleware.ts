@@ -33,7 +33,6 @@ export function middleware(request: NextRequest) {
         return NextResponse.redirect(redirectUrl)
     }
 
-    // console.log(pathname)
     if(!isAccessTokenValid && isAuthAPIPath){
         return NextResponse.next()
     }

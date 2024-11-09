@@ -1,4 +1,5 @@
 "use client"
+import { socket } from "@/lib/socket"
 import StorageService from "@/lib/storage"
 import useLogout from "@/queries/useLogout"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -22,7 +23,9 @@ const LogoutComponent = () => {
     } else {
       const logout = setTimeout(() => {
         mutateAsync(null as any, {
-          onSettled() {}
+          onSettled() {
+            socket.disconnect()
+          }
         }).finally(() => {
           router.push("/login")
         })

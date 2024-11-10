@@ -2,8 +2,6 @@
 
 import { socket } from "@/lib/socket"
 import jwt from "jsonwebtoken"
-
-
 import authAPI from "@/apiRequests/auth"
 import { useAppContext } from "@/components/app-provider"
 import { useMutation } from "@tanstack/react-query"
@@ -11,40 +9,6 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useRef } from "react"
 import { TokenPayload } from "@/types/jwt.types"
 import { toast } from "sonner"
-// const LogoutComponent = () => {
-//   const { mutateAsync } = useLogout()
-//   const router = useRouter()
-//   const params = useSearchParams()
-//   const refreshToken = params.get("rt")
-//   const accessToken = params.get("at")
-
-//   useEffect(() => {
-//     if (
-//       !refreshToken ||
-//       refreshToken !== StorageService.getRefreshToken()
-//     ) {
-//       setTimeout(() => {
-//         router.push("/login")
-//       }, 5000)
-//     } else {
-//       const logout = setTimeout(() => {
-//         mutateAsync(null as any, {
-//           onSettled() {
-//             socket.disconnect()
-//           }
-//         }).finally(() => {
-//           router.push("/login")
-//         })
-//       }, 0)
-
-//       return () => {
-//         clearTimeout(logout)
-//       }
-//     }
-//   }, [])
-
-//   return <div>Token Expires, Redirecting ...</div>
-// }
 
 export default function Page() {
   const searchParams = useSearchParams()
@@ -81,5 +45,6 @@ export default function Page() {
     }
   }, [accessToken , message, refreshToken])
 
-  return null
+  return <div>
+    Getting Your Information From Google and Redirecting To Dashboard...<div/>
 }

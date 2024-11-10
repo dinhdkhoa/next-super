@@ -16,7 +16,7 @@ function SocketLogout() {
     const { setRole } = useAppContext()
 
     useEffect(() => {
-        if (isPublicPath) return
+        if (isPublicPath && pathname !== '/') return
 
         if (logoutMutation.isPending || !socket.isConnected) return
 

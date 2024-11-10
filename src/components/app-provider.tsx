@@ -36,7 +36,6 @@ useEffect(() => {
     }
   } 
   return () => {
-    console.log('cleanup')
     socket.disconnect();
   };
 },[])

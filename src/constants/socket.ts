@@ -5,4 +5,5 @@ export const SocketEventListener = {
   NewOrder: 'new-order',
   Payment: 'payment',
   RefreshToken: 'refresh-token',
+  Logout: 'logout',
 } as const;

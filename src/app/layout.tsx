@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner"
 import { ThemeProvider } from "@/components/theme-provider"
 import AppProvider from "@/components/app-provider"
 import RefreshToken from "@/components/refresh-token"
+import SocketLogout from "@/components/socket-logout"
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -39,6 +40,7 @@ export default function RootLayout({
             {children}
             <Toaster richColors />
             <RefreshToken />
+            <SocketLogout />
           </ThemeProvider>
         </AppProvider>
       </body>

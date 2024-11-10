@@ -15,6 +15,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useAppContext } from '@/components/app-provider'
 import { useEffect } from 'react'
 import { socket } from '@/lib/socket'
+import OauthGoogleBtn from './oauth-google-btn'
 
 
 export default function LoginForm() {
@@ -117,9 +118,7 @@ export default function LoginForm() {
               <Button type="submit" className="w-full">
                 Đăng nhập
               </Button>
-              <Button variant="outline" className="w-full" type="button">
-                Đăng nhập bằng Google
-              </Button>
+              <OauthGoogleBtn />
             </div>
           </form>
         </fieldset>

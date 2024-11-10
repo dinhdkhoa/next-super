@@ -141,6 +141,9 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
             //  handle auth with cookies
             // clientSessionToken.value = '';
             // clientSessionToken.expiresAt = new Date().toUTCString()
+        } else if (url === 'api/auth/set-cookies'){
+            StorageService.setAccessToken((payload as LoginResType['data']).accessToken)
+            StorageService.setRefreshToken((payload as LoginResType['data']).refreshToken)
         }
     }
 

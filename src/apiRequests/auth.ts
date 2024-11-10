@@ -3,6 +3,7 @@ import { LoginBodyType, LoginResType, RefreshTokenBodyType, RefreshTokenResType 
 
 const authAPI = {
     refreshTokenReq: null as Promise<{ status: number, payload: RefreshTokenResType }> | null,
+    setCookiesReq: null as Promise<{ status: number, payload: RefreshTokenResType['data'] }> | null,
     loginServer: (body: LoginBodyType) => http.post<LoginResType>('auth/login', body),
     loginClient: (body: LoginBodyType) => http.post<LoginResType>('api/auth/login', body, {
         baseUrl: ''
@@ -30,6 +31,17 @@ const authAPI = {
         })
         const res = await this.refreshTokenReq
         this.refreshTokenReq = null
+        return res
+    },
+    async setCookies(body: RefreshTokenResType['data']){
+        if (this.setCookiesReq){
+            return this.setCookiesReq
+        }
+        this.setCookiesReq = http.post<RefreshTokenResType['data']>('api/auth/set-cookies', body, {
+            baseUrl: ''
+        })
+        const res = await this.setCookiesReq
+        this.setCookiesReq = null
         return res
     },
 }

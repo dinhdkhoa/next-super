@@ -1,9 +1,10 @@
 'use client'
 
-import { useAppContext } from '@/components/app-provider'
+import AppProvider from "@/components/app-provider"
 import { Button } from '@/components/ui/button'
 import { checkPathName } from '@/constants/route-middleware'
 import { Role } from '@/constants/type'
+import useAuthStore from "@/hooks/zustand/useAuthStore"
 import { socket } from '@/lib/socket'
 import { handleApiError } from '@/lib/utils'
 import useLogout, { useLogoutGuest } from '@/queries/useLogout'
@@ -36,12 +37,14 @@ const menuItems = [
 
 export default function NavItems({ className }: { className?: string }) {
 
-  const { isAuth: isSignedIn, role, setRole } = useAppContext()
+  const isLoggedIn = useAuthStore.use.isLoggedIn()
+  const role = useAuthStore.use.role?.()
+
   const pathname = usePathname()
 
   const { isGuestPath, isEmployeePath } = checkPathName(pathname)
 
-  if (!isSignedIn || !role) return (<Link href={menuItems[0].href} className={className}>
+  if (!isLoggedIn || !role) return (<Link href={menuItems[0].href} className={className}>
     {menuItems[0].title}
   </Link>)
 
@@ -64,12 +67,12 @@ export default function NavItems({ className }: { className?: string }) {
         </Link>
       )
     })}
-    <NavLogoutButton role={role} setRole={setRole}/>
+    <NavLogoutButton role={role} />
   </>
 }
 
-const NavLogoutButton = ({role, setRole} : {role: RoleType, setRole: (role?: RoleType) => void}) => {
-
+const NavLogoutButton = ({role, } : {role: RoleType}) => {
+  const setRole = useAuthStore.use.setRole()
   const logoutMutation = useLogout()
   const logoutGuestMutation = useLogoutGuest()
   const router = useRouter()

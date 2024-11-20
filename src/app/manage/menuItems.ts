@@ -30,7 +30,7 @@ const menuItems = [
   {
     title: 'Nhân viên',
     Icon: Users2,
-    href: '/manage/accounts',
+    href: '/',
     isOwner: true
   }
 ]

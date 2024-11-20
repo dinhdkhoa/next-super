@@ -1,8 +1,10 @@
 'use client'
 import menuItems from '@/app/manage/menuItems'
-import { useAppContext } from '@/components/app-provider'
+import AppProvider from "@/components/app-provider"
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { useAuthStoreBase } from '@/hooks/zustand/useAuthStore'
+import useStorePersist from '@/hooks/zustand/useStorePersist'
 import { cn } from '@/lib/utils'
 import { Package2, PanelLeft } from 'lucide-react'
 import Link from 'next/link'
@@ -10,7 +12,8 @@ import { usePathname } from 'next/navigation'
 
 export default function MobileNavLinks() {
   const pathname = usePathname()
-  const { role } = useAppContext()
+  const role = useStorePersist(useAuthStoreBase, state => state.role)
+
   return (
     <Sheet>
       <SheetTrigger asChild>

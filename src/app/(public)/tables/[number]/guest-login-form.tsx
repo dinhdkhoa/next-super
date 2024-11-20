@@ -1,5 +1,5 @@
 'use client'
-import { useAppContext } from '@/components/app-provider'
+import AppProvider from "@/components/app-provider"
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
@@ -14,9 +14,10 @@ import { toast } from 'sonner'
 import { useGuestLoginMutation } from './queries/useGuestAuthQueries'
 import { useEffect } from 'react'
 import { socket } from '@/lib/socket'
+import useAuthStore from "@/hooks/zustand/useAuthStore"
 
 export default function GuestLoginForm() {
-  const {setRole} = useAppContext()
+  const setRole = useAuthStore.use.setRole()
   const router = useRouter()
   const queryString = useSearchParams()
   const queryParams = useParams()

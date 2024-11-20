@@ -1,20 +1,20 @@
 'use client'
+import authAPI from '@/apiRequests/auth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useForm } from 'react-hook-form'
-import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
+import useAuthStore from '@/hooks/zustand/useAuthStore'
+import { socket } from '@/lib/socket'
+import { handleApiError } from '@/lib/utils'
 import { LoginBody, LoginBodyType } from '@/schemaValidations/auth.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
-import authAPI from '@/apiRequests/auth'
-import { toast } from "sonner"
-import { handleApiError } from '@/lib/utils'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useAppContext } from '@/components/app-provider'
 import { useEffect } from 'react'
-import { socket } from '@/lib/socket'
+import { useForm } from 'react-hook-form'
+import { toast } from "sonner"
 import OauthGoogleBtn from './oauth-google-btn'
 
 
@@ -23,7 +23,7 @@ export default function LoginForm() {
   const params = useSearchParams()
   const refreshToken = params.get("rt")
   const returnUrl = params.get("returnUrl")
-  const {setRole} = useAppContext()
+  const setRole = useAuthStore.use.setRole()
 
   useEffect(() => {
     if(refreshToken == 'expired'){

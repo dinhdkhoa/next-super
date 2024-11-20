@@ -3,21 +3,22 @@
 import { socket } from "@/lib/socket"
 import jwt from "jsonwebtoken"
 import authAPI from "@/apiRequests/auth"
-import { useAppContext } from "@/components/app-provider"
+import AppProvider from "@/components/app-provider"
 import { useMutation } from "@tanstack/react-query"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useRef } from "react"
 import { TokenPayload } from "@/types/jwt.types"
 import { toast } from "sonner"
+import useAuthStore from "@/hooks/zustand/useAuthStore"
 
 export default function Page() {
   const searchParams = useSearchParams()
   const accessToken = searchParams.get('accessToken')
   const refreshToken = searchParams.get('refreshToken')
   const message = searchParams.get('message')
-  const { setRole } = useAppContext()
   const router = useRouter()
   const setCookieCalledRef = useRef(false);
+  const setRole = useAuthStore.use.setRole()
 
   const setCookie = useMutation({
     mutationFn: authAPI.setCookies
@@ -41,10 +42,13 @@ export default function Page() {
 
     if (accessToken && refreshToken) {
       setCookie.mutateAsync({ accessToken, refreshToken });
+      const {role} = jwt.decode(accessToken) as TokenPayload
+      setRole(role)
       setCookieCalledRef.current = true;
     }
   }, [accessToken , message, refreshToken])
 
   return <div>
-    Getting Your Information From Google and Redirecting To Dashboard...<div/>
+    Getting Your Information From Google and Redirecting To Dashboard...
+  </div>
 }

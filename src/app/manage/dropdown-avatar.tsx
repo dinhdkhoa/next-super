@@ -1,4 +1,6 @@
 'use client'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,24 +9,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import authAPI from '@/apiRequests/auth'
+import useAuthStore from '@/hooks/zustand/useAuthStore'
+import { socket } from '@/lib/socket'
 import { handleApiError } from '@/lib/utils'
-import accountAPI from '@/apiRequests/account'
 import useGetAccount from '@/queries/useGetAccount'
 import useLogout from '@/queries/useLogout'
-import { useAppContext } from '@/components/app-provider'
-import { socket } from '@/lib/socket'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 
 export default function DropdownAvatar() {
   const router = useRouter()
   const {data} = useGetAccount()
-  const {setRole} = useAppContext()
+  const setRole = useAuthStore.use.setRole()
 
   const account = data?.payload.data
 

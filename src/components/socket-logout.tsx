@@ -3,18 +3,19 @@ import { checkPathName } from '@/constants/route-middleware'
 import useLogout from '@/queries/useLogout'
 import { usePathname, useRouter } from 'next/navigation'
 import React, { useEffect } from 'react'
-import { useAppContext } from './app-provider'
+import AppProvider from "@/components/app-provider"
 import { socket } from '@/lib/socket'
 import { handleApiError } from '@/lib/utils'
 import { SocketEventListener } from '@/constants/socket'
+import useAuthStore from '@/hooks/zustand/useAuthStore'
 
 function SocketLogout() {
     const router = useRouter()
     const pathname = usePathname()
     const { isPublicPath } = checkPathName(pathname)
     const logoutMutation = useLogout()
-    const { setRole } = useAppContext()
-
+    const setRole = useAuthStore.use.setRole()
+  
     useEffect(() => {
         if (isPublicPath && pathname !== '/') return
 

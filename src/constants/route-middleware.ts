@@ -25,7 +25,8 @@ const isPublicPath = (pathName: string) => {
     return( pathName === '/' || (!isPrivatePath(pathName) && !isAuthPath(pathName))) && !isAuthAPIPath(pathName)
 } 
 
-const checkPathName = (pathName: string) => {
+const checkPathName = (_pathName: string) => {
+    const pathName = _pathName.slice(3,_pathName.length)
     return {
         isPublicPath: isPublicPath(pathName),
         isPrivatePath: isPrivatePath(pathName),

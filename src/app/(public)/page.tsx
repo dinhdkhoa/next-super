@@ -2,8 +2,10 @@ import dishesAPI from '@/apiRequests/dishes'
 import { formatCurrency, handleApiError } from '@/lib/utils'
 import { DishListResType, DishResType } from '@/schemaValidations/dish.schema'
 import Image from 'next/image'
+import {getTranslations} from 'next-intl/server';
 
 export default async function Home() {
+  const t = await getTranslations('HomePage');
   let dishes: DishListResType['data'] = []
   try {
     const data = await dishesAPI.getDishes()
@@ -25,6 +27,7 @@ export default async function Home() {
         />
         <div className='z-20 relative py-10 md:py-20 px-4 sm:px-10 md:px-20'>
           <h1 className='text-center text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold'>Nhà hàng Big Boy</h1>
+          <h1 className='text-center text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold'>{t('title')}</h1>
           <p className='text-center text-sm sm:text-base mt-4'>Vị ngon, trọn khoảnh khắc</p>
         </div>
       </div>

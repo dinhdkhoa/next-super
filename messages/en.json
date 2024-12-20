@@ -1,5 +1,10 @@
 {
     "HomePage": {
       "title": "Hello world!"
-    }
+    },
+    "LocaleSwitcher": {
+      "vi": "Tiếng Việt",
+      "en": "English",
+    "label": "Language"
+  }
   }

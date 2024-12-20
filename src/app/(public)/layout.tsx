@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import DarkModeToggle from '@/components/dark-mode-toggle'
 import NavItems from '@/app/(public)/nav-items'
+import LanguageSelect from '@/components/language-select'
 
 export default function Layout({
   children
@@ -38,7 +39,8 @@ export default function Layout({
             </nav>
           </SheetContent>
         </Sheet>
-        <div className='ml-auto'>
+        <div className='ml-auto flex gap-4 items-center'>
+          <LanguageSelect />
           <DarkModeToggle />
         </div>
       </header>

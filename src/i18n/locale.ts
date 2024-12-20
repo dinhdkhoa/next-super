@@ -15,17 +15,3 @@ export async function getUserLocale() {
 export async function setUserLocale(locale: Locale) {
   cookies().set(COOKIE_NAME, locale);
 }
-
-export const getCookieClient = (cookieName: string) => {
-  if(!isClient) return null
-  const name = `${cookieName}=`;
-  const decodedCookie = decodeURIComponent(document.cookie);
-  const cookiesArray = decodedCookie.split(';');
-  for (let i = 0; i < cookiesArray.length; i++) {
-      let cookie = cookiesArray[i].trim();
-      if (cookie.indexOf(name) === 0) {
-          return cookie.substring(name.length, cookie.length);
-      }
-  }
-  return null;
-}

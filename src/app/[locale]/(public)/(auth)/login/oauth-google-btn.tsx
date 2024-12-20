@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import envConfig from '@/config'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import React from 'react'
 
@@ -22,10 +23,12 @@ const getOauthGoogleUrl = () => {
 const googleOauthUrl = getOauthGoogleUrl()
 
 function OauthGoogleBtn() {
+    const t = useTranslations('LoginPage')
+    
     return (
         <Link href={getOauthGoogleUrl()}>
             <Button variant="outline" className="w-full" type="button">
-                Đăng nhập bằng Google
+                {t('login-with-google')}
             </Button>
         </Link>
     )

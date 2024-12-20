@@ -18,7 +18,6 @@ export function middleware(request: NextRequest) {
     const i18nResponse = handleI18nRouting(request)
 
     const {isAuthPath,isEmployeePath, isGuestPath,isPrivatePath, isPublicPath, isAuthAPIPath} = checkPathName(pathname)
-    console.log({isAuthPath,isEmployeePath, isGuestPath,isPrivatePath, isPublicPath, isAuthAPIPath})
     
     if(isPublicPath) return i18nResponse
 

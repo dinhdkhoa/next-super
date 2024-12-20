@@ -16,6 +16,7 @@ import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from "sonner"
 import OauthGoogleBtn from './oauth-google-btn'
+import { useTranslations } from 'next-intl'
 
 
 export default function LoginForm() {
@@ -24,6 +25,7 @@ export default function LoginForm() {
   const refreshToken = params.get("rt")
   const returnUrl = params.get("returnUrl")
   const setRole = useAuthStore.use.setRole()
+  const t = useTranslations('LoginPage')
 
   useEffect(() => {
     if(refreshToken == 'expired'){
@@ -61,9 +63,9 @@ export default function LoginForm() {
   return (
     <Card className="mx-auto max-w-sm">
       <CardHeader>
-        <CardTitle className="text-2xl">Đăng nhập</CardTitle>
+        <CardTitle className="text-2xl">{t('title')}</CardTitle>
         <CardDescription>
-          Nhập email và mật khẩu của bạn để đăng nhập vào hệ thống
+          {t('description')}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -81,7 +83,7 @@ export default function LoginForm() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="grid gap-2">
-                      <Label htmlFor="email">Email</Label>
+                      <Label htmlFor="email">{t('email-field-title')}</Label>
                       <Input
                         id="email"
                         type="email"
@@ -101,7 +103,7 @@ export default function LoginForm() {
                   <FormItem>
                     <div className="grid gap-2">
                       <div className="flex items-center">
-                        <Label htmlFor="password">Password</Label>
+                        <Label htmlFor="password">{t('password-field-title')}</Label>
                       </div>
                       <Input
                         id="password"
@@ -116,7 +118,7 @@ export default function LoginForm() {
                 )}
               />
               <Button type="submit" className="w-full">
-                Đăng nhập
+              {t('login-button')}
               </Button>
               <OauthGoogleBtn />
             </div>

@@ -1,10 +1,18 @@
 {
-    "HomePage": {
-      "title": "Hello world!"
-    },
-    "LocaleSwitcher": {
-      "vi": "Tiếng Việt",
-      "en": "English",
+  "HomePage": {
+    "title": "Hello world!"
+  },
+  "LocaleSwitcher": {
+    "vi": "Tiếng Việt",
+    "en": "English",
     "label": "Language"
+  },
+  "LoginPage": {
+    "title": "Login",
+    "description": "Enter your email and password to log in to the system",
+    "email-field-title": "Email",
+    "password-field-title": "Password",
+    "login-button": "Login",
+    "login-with-google": "Login with Google"
   }
-  }
+}

@@ -1,10 +1,18 @@
 {
-    "HomePage": {
-      "title": "Xin chào thế giới!"
-    },
-    "LocaleSwitcher": {
+  "HomePage": {
+    "title": "Xin chào thế giới!"
+  },
+  "LocaleSwitcher": {
     "vi": "Tiếng Việt",
     "en": "English",
     "label": "Language"
+  },
+  "LoginPage": {
+    "title": "Đăng nhập",
+    "description": "Nhập email và mật khẩu của bạn để đăng nhập vào hệ thống",
+    "email-field-title": "Email",
+    "password-field-title": "Mật khẩu",
+    "login-button": "Đăng nhập",
+    "login-with-google": "Đăng nhập bằng Google"
   }
 }

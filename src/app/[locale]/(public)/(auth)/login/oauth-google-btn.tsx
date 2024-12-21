@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
 import envConfig from '@/config'
 import { useTranslations } from 'next-intl'
-import Link from 'next/link'
+import { Link } from '@/i18n/routing'
 import React from 'react'
 
 const getOauthGoogleUrl = () => {

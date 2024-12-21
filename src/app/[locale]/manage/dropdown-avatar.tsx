@@ -14,7 +14,7 @@ import { socket } from '@/lib/socket'
 import { handleApiError } from '@/lib/utils'
 import useGetAccount from '@/queries/useGetAccount'
 import useLogout from '@/queries/useLogout'
-import Link from 'next/link'
+import { Link } from '@/i18n/routing'
 import { useRouter } from 'next/navigation'
 
 

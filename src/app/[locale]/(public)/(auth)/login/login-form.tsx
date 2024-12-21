@@ -11,12 +11,13 @@ import { handleApiError } from '@/lib/utils'
 import { LoginBody, LoginBodyType } from '@/schemaValidations/auth.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from "sonner"
 import OauthGoogleBtn from './oauth-google-btn'
 import { useTranslations } from 'next-intl'
+import { useRouter } from '@/i18n/routing'
+import { useSearchParams } from 'next/navigation'
 
 
 export default function LoginForm() {

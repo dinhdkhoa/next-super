@@ -1,10 +1,10 @@
-import Link from 'next/link'
 import { Menu, Package2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import DarkModeToggle from '@/components/dark-mode-toggle'
 import LanguageSelect from '@/components/language-select'
 import NavItems from './nav-items'
+import { Link } from '@/i18n/routing'
 
 export default function Layout({
   children

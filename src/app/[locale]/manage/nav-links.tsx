@@ -6,7 +6,7 @@ import { useAuthStoreBase } from '@/hooks/zustand/useAuthStore'
 import useStorePersist from '@/hooks/zustand/useStorePersist'
 import { cn } from '@/lib/utils'
 import { Package2, Settings } from 'lucide-react'
-import Link from 'next/link'
+import { Link } from '@/i18n/routing'
 import { usePathname } from 'next/navigation'
 
 export default function NavLinks() {

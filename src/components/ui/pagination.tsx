@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { ChevronLeftIcon, ChevronRightIcon, DotsHorizontalIcon } from '@radix-ui/react-icons'
-import Link from 'next/link'
+import { Link } from '@/i18n/routing'
 import { cn } from '@/lib/utils'
 import { ButtonProps, buttonVariants } from '@/components/ui/button'
 

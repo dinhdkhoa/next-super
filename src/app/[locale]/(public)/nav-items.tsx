@@ -9,7 +9,7 @@ import { socket } from '@/lib/socket'
 import { handleApiError } from '@/lib/utils'
 import useLogout, { useLogoutGuest } from '@/queries/useLogout'
 import { RoleType } from '@/types/jwt.types'
-import Link from 'next/link'
+import { Link } from '@/i18n/routing'
 import { usePathname, useRouter } from 'next/navigation'
 
 const menuItems = [

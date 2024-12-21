@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { UpdateTableBody, UpdateTableBodyType } from '@/schemaValidations/table.schema'
 import { TableStatus, TableStatusValues } from '@/constants/type'
 import { Switch } from '@/components/ui/switch'
-import Link from 'next/link'
+import { Link } from '@/i18n/routing'
 import { toast } from 'sonner'
 import { FormEvent, useEffect } from 'react'
 import { useQuery } from '@tanstack/react-query'

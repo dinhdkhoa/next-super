@@ -1,30 +1,32 @@
 'use client'
 import authAPI from '@/apiRequests/auth'
+import { SearchParamsLoader } from '@/components/search-params-loader'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import useAuthStore from '@/hooks/zustand/useAuthStore'
+import { useSeachParamsLoader } from '@/hooks/use-search-params-loader'
+import useAuthStore from '@/hooks/zustand/use-auth-store'
+import { useRouter } from '@/i18n/routing'
 import { socket } from '@/lib/socket'
 import { handleApiError } from '@/lib/utils'
 import { LoginBody, LoginBodyType } from '@/schemaValidations/auth.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation } from '@tanstack/react-query'
+import { useTranslations } from 'next-intl'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from "sonner"
 import OauthGoogleBtn from './oauth-google-btn'
-import { useTranslations } from 'next-intl'
-import { useRouter } from '@/i18n/routing'
-import { useSearchParams } from 'next/navigation'
 
 
 export default function LoginForm() {
   const router = useRouter()
-  const params = useSearchParams()
-  const refreshToken = params.get("rt")
-  const returnUrl = params.get("returnUrl")
+  // const params = useSearchParams()
+  const {params, onParamsReceived} = useSeachParamsLoader()
+  const refreshToken = params?.get("rt")
+  const returnUrl = params?.get("returnUrl")
   const setRole = useAuthStore.use.setRole()
   const t = useTranslations('LoginPage')
 
@@ -63,6 +65,7 @@ export default function LoginForm() {
 
   return (
     <Card className="mx-auto max-w-sm">
+      <SearchParamsLoader onParamsReceived={onParamsReceived}/>
       <CardHeader>
         <CardTitle className="text-2xl">{t('title')}</CardTitle>
         <CardDescription>

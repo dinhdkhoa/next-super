@@ -4,13 +4,23 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import DarkModeToggle from '@/components/dark-mode-toggle'
 import LanguageSelect from '@/components/language-select'
 import NavItems from './nav-items'
-import { Link } from '@/i18n/routing'
+import { Link, routing } from '@/i18n/routing'
+import { notFound } from 'next/navigation'
+import { setRequestLocale } from 'next-intl/server'
 
 export default function Layout({
-  children
+  children,
+  params: {locale}
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode,
+  params: {locale: string}
 }>) {
+  if (!routing.locales.includes(locale as any)) {
+    notFound();
+  }
+ 
+  // Enable static rendering
+  setRequestLocale(locale);
   return (
     <div className='flex min-h-screen w-full flex-col relative'>
       <header className='sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6 z-20'>

@@ -10,12 +10,14 @@ import { useEffect, useRef } from "react"
 import { TokenPayload } from "@/types/jwt.types"
 import { toast } from "sonner"
 import useAuthStore from "@/hooks/zustand/use-auth-store"
+import { SearchParamsLoader } from "@/components/search-params-loader"
+import { useSeachParamsLoader } from "@/hooks/use-search-params-loader"
 
 export default function Page() {
-  const searchParams = useSearchParams()
-  const accessToken = searchParams.get('accessToken')
-  const refreshToken = searchParams.get('refreshToken')
-  const message = searchParams.get('message')
+  const {params, onParamsReceived} = useSeachParamsLoader()
+  const accessToken = params?.get('accessToken')
+  const refreshToken = params?.get('refreshToken')
+  const message = params?.get('message')
   const router = useRouter()
   const setCookieCalledRef = useRef(false);
   const setRole = useAuthStore.use.setRole()
@@ -49,6 +51,8 @@ export default function Page() {
   }, [accessToken , message, refreshToken])
 
   return <div>
+    <SearchParamsLoader onParamsReceived={onParamsReceived}/>
+    
     Getting Your Information From Google and Redirecting To Dashboard...
   </div>
 }

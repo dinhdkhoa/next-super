@@ -8,7 +8,9 @@ import AppProvider from "@/components/app-provider"
 import RefreshToken from "@/components/refresh-token"
 import SocketLogout from "@/components/socket-logout"
 import { NextIntlClientProvider } from 'next-intl';
-import { getLocale, getMessages } from 'next-intl/server';
+import { getLocale, getMessages, setRequestLocale } from 'next-intl/server';
+import { routing } from "@/i18n/routing"
+import { notFound } from "next/navigation"
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -19,12 +21,22 @@ export const metadata: Metadata = {
   description: "The best restaurant in the world"
 }
 
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({locale}));
+}
+
 export default async function RootLayout({
-  children
+  children,
+  params: {locale}
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode,
+  params: {locale: string}
 }>) {
-  const locale = await getLocale();
+  if (!routing.locales.includes(locale as any)) {
+    notFound();
+  }
+  setRequestLocale(locale);
+  // const locale = await getLocale();
   const messages = await getMessages();
 
   return (

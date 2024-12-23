@@ -3,7 +3,12 @@ import { cn, formatCurrency } from '@/lib/utils'
 import Image from 'next/image'
 import React from 'react'
 
-async function DishDetailPublicPage({ params: { id } }: { params: { id: string } }) {
+const unslugifyDish = (slug: string) => {
+    const [name, id] = slug.split('-i.');
+    return { name, id: parseInt(id) };
+}
+async function DishDetailPublicPage({ params: { slug } }: { params: { slug: string } }) {
+    const {id} = unslugifyDish(slug)
     const data = await dishesAPI.getDishDetail(Number(id))
     //To do : error handling for non-exist dish id
     const dish = data.payload.data

@@ -1,9 +1,11 @@
 import dishesAPI from '@/apiRequests/dishes'
-import { formatCurrency, handleApiError } from '@/lib/utils'
+import { formatCurrency, handleApiError, slugify } from '@/lib/utils'
 import { DishListResType, DishResType } from '@/schemaValidations/dish.schema'
 import Image from 'next/image'
 import {getTranslations} from 'next-intl/server';
+import { Link } from '@/i18n/routing';
 
+const slugifyDish = (name: string, id: number) => `${slugify(name)}-i.${id}`
 export default async function Home() {
   const t = await getTranslations('HomePage');
   let dishes: DishListResType['data'] = []
@@ -35,7 +37,7 @@ export default async function Home() {
         <h2 className='text-center text-2xl font-bold'>Đa dạng các món ăn</h2>
         <div className='grid grid-cols-1 sm:grid-cols-2 gap-10'>
           {dishes.map((dish) => (
-              <div className='flex gap-4 w' key={dish.id}>
+              <Link href={`/dishes/${slugifyDish(dish.name, dish.id)}`} className='flex gap-4 w' key={dish.id}>
                 <div className='flex-shrink-0'>
                   <Image
                     src={dish.image}
@@ -51,7 +53,7 @@ export default async function Home() {
                   <p className=''>{dish.description}</p>
                   <p className='font-semibold'>{formatCurrency(dish.price)}</p>
                 </div>
-              </div>
+              </Link>
             ))}
         </div>
       </section>

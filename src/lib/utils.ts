@@ -4,25 +4,32 @@ import { toast } from "sonner"
 import { twMerge } from "tailwind-merge"
 import { FormError, HttpError } from "./https"
 import StorageService from "./storage"
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken"
 import authAPI from "@/apiRequests/auth"
 import { DishStatus, OrderStatus, Role, TableStatus } from "@/constants/type"
 import envConfig from "@/config"
 import { TokenPayload } from "@/types/jwt.types"
 import guestAPI from "@/apiRequests/guest"
-import { BookX, CookingPot, HandCoins, Loader, Truck } from 'lucide-react'
-import { format } from 'date-fns'
-
+import { BookX, CookingPot, HandCoins, Loader, Truck } from "lucide-react"
+import { format } from "date-fns"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const handleApiError = (error: unknown, setError?: UseFormSetError<any>, duration = 5000): void => {
-  if (error instanceof FormError && setError && error.payload.errors.length > 0) {
-    error.payload.errors.forEach(error => {
+export const handleApiError = (
+  error: unknown,
+  setError?: UseFormSetError<any>,
+  duration = 5000
+): void => {
+  if (
+    error instanceof FormError &&
+    setError &&
+    error.payload.errors.length > 0
+  ) {
+    error.payload.errors.forEach((error) => {
       setError(error.field, {
-        type: 'Server',
+        type: "Server",
         message: error.message
       })
     })
@@ -30,30 +37,42 @@ export const handleApiError = (error: unknown, setError?: UseFormSetError<any>, 
     toast.error(error.message, {
       duration
     })
-  } else if (error && typeof error === 'object' && 'message' in error && isClient) {
+  } else if (
+    error &&
+    typeof error === "object" &&
+    "message" in error &&
+    isClient
+  ) {
     toast.error(String(error.message), {
       duration
     })
   }
 }
 
-export const isClient = typeof window !== 'undefined'
+export const isClient = typeof window !== "undefined"
 
-export async function checkAndRefreshToken(onSuccess?: () => void, onError?: () => void, force?: boolean) {
+export async function checkAndRefreshToken(
+  onSuccess?: () => void,
+  onError?: () => void,
+  force?: boolean
+) {
   const refreshToken = StorageService.getRefreshToken()
   const accessToken = StorageService.getAccessToken()
 
-  if (!refreshToken){
+  if (!refreshToken) {
     authAPI.logoutClient()
     return onError && onError()
   }
 
-  const decodedAT = accessToken ? jwt.decode(accessToken) as TokenPayload : { exp: 0, iat: 0 }
+  const decodedAT = accessToken
+    ? (jwt.decode(accessToken) as TokenPayload)
+    : { exp: 0, iat: 0 }
   const decodedRT = jwt.decode(refreshToken) as TokenPayload
 
   const now = new Date().getTime() / 1000 // get epoch time in ms
 
-  if (decodedRT.exp <= now - 1 ){ // bc expires in cookies is diffreent from ls for uknown reasons
+  if (decodedRT.exp <= now - 1) {
+    // bc expires in cookies is diffreent from ls for uknown reasons
     StorageService.removeTokens()
     return
   }
@@ -61,16 +80,15 @@ export async function checkAndRefreshToken(onSuccess?: () => void, onError?: () 
   const accessTokenDuration = decodedAT.exp - decodedAT.iat
   const accessTokenValidTimeLeft = decodedAT.exp - now
 
-  if ((accessTokenValidTimeLeft < accessTokenDuration / 3) || force) {
+  if (accessTokenValidTimeLeft < accessTokenDuration / 3 || force) {
     try {
       const role = decodedRT.role
-      if(role !== Role.Guest){
+      if (role !== Role.Guest) {
         await authAPI.refreshTokenClient()
       } else {
         await guestAPI.refreshTokenClient()
       }
       onSuccess && onSuccess()
-
     } catch (error) {
       onError && onError()
     }
@@ -79,22 +97,27 @@ export async function checkAndRefreshToken(onSuccess?: () => void, onError?: () 
 
 export function removeAccents(str: string) {
   return str
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/Đ/g, 'D')
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
 }
 
 export const simpleMatchText = (fullText: string, matchText: string) => {
-  return removeAccents(fullText.toLowerCase()).includes(removeAccents(matchText.trim().toLowerCase()))
+  return removeAccents(fullText.toLowerCase()).includes(
+    removeAccents(matchText.trim().toLowerCase())
+  )
 }
 
 export const formatDateTimeToLocaleString = (date: string | Date) => {
-  return format(date instanceof Date ? date : new Date(date), 'HH:mm:ss dd/MM/yyyy')
+  return format(
+    date instanceof Date ? date : new Date(date),
+    "HH:mm:ss dd/MM/yyyy"
+  )
 }
 
 export const formatDateTimeToTimeString = (date: string | Date) => {
-  return format(date instanceof Date ? date : new Date(date), 'HH:mm:ss')
+  return format(date instanceof Date ? date : new Date(date), "HH:mm:ss")
 }
 
 export const OrderStatusIcon = {
@@ -106,49 +129,73 @@ export const OrderStatusIcon = {
 }
 
 export const formatCurrency = (number: number) => {
-  return new Intl.NumberFormat('vi-VN', {
-    style: 'currency',
-    currency: 'VND'
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND"
   }).format(number)
 }
 
-export const getVietnameseDishStatus = (status: (typeof DishStatus)[keyof typeof DishStatus]) => {
+export const getVietnameseDishStatus = (
+  status: (typeof DishStatus)[keyof typeof DishStatus]
+) => {
   switch (status) {
     case DishStatus.Available:
-      return 'Có sẵn'
+      return "Có sẵn"
     case DishStatus.Unavailable:
-      return 'Không có sẵn'
+      return "Không có sẵn"
     default:
-      return 'Ẩn'
+      return "Ẩn"
   }
 }
 
-export const getVietnameseOrderStatus = (status: (typeof OrderStatus)[keyof typeof OrderStatus]) => {
+export const getVietnameseOrderStatus = (
+  status: (typeof OrderStatus)[keyof typeof OrderStatus]
+) => {
   switch (status) {
     case OrderStatus.Delivered:
-      return 'Đã phục vụ'
+      return "Đã phục vụ"
     case OrderStatus.Paid:
-      return 'Đã thanh toán'
+      return "Đã thanh toán"
     case OrderStatus.Pending:
-      return 'Chờ xử lý'
+      return "Chờ xử lý"
     case OrderStatus.Processing:
-      return 'Đang nấu'
+      return "Đang nấu"
     default:
-      return 'Từ chối'
+      return "Từ chối"
   }
 }
 
-export const getVietnameseTableStatus = (status: (typeof TableStatus)[keyof typeof TableStatus]) => {
+export const getVietnameseTableStatus = (
+  status: (typeof TableStatus)[keyof typeof TableStatus]
+) => {
   switch (status) {
     case TableStatus.Available:
-      return 'Có sẵn'
+      return "Có sẵn"
     case TableStatus.Reserved:
-      return 'Đã đặt'
+      return "Đã đặt"
     default:
-      return 'Ẩn'
+      return "Ẩn"
   }
 }
 
-export const getTableLink = ({ token, tableNumber }: { token: string; tableNumber: number }) => {
-  return envConfig.NEXT_PUBLIC_URL + '/tables/' + tableNumber + '?token=' + token
+export const getTableLink = ({
+  token,
+  tableNumber
+}: {
+  token: string
+  tableNumber: number
+}) => {
+  return (
+    envConfig.NEXT_PUBLIC_URL + "/tables/" + tableNumber + "?token=" + token
+  )
 }
+
+export const slugify = (text: string) => {
+  return text
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w\-]+/g, "")
+    .replace(/\-\-+/g, "-")
+} //todo: Add slug to home page

@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import useAuthStore from '@/hooks/zustand/useAuthStore'
+import useAuthStore from '@/hooks/zustand/use-auth-store'
 import { socket } from '@/lib/socket'
 import { handleApiError } from '@/lib/utils'
 import useGetAccount from '@/queries/useGetAccount'

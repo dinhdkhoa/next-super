@@ -7,7 +7,7 @@ import AppProvider from "@/components/app-provider"
 import { socket } from '@/lib/socket'
 import { handleApiError } from '@/lib/utils'
 import { SocketEventListener } from '@/constants/socket'
-import useAuthStore from '@/hooks/zustand/useAuthStore'
+import useAuthStore from '@/hooks/zustand/use-auth-store'
 
 function SocketLogout() {
     const router = useRouter()

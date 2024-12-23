@@ -1,6 +1,6 @@
 "use client"
 import { checkPathName } from '@/constants/route-middleware'
-import useAuthStore from "@/hooks/zustand/useAuthStore"
+import useAuthStore from "@/hooks/zustand/use-auth-store"
 import StorageService from '@/lib/storage'
 import { checkAndRefreshToken } from '@/lib/utils'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'

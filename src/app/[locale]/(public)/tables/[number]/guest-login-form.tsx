@@ -14,7 +14,7 @@ import { toast } from 'sonner'
 import { useGuestLoginMutation } from './queries/useGuestAuthQueries'
 import { useEffect } from 'react'
 import { socket } from '@/lib/socket'
-import useAuthStore from "@/hooks/zustand/useAuthStore"
+import useAuthStore from "@/hooks/zustand/use-auth-store"
 
 export default function GuestLoginForm() {
   const setRole = useAuthStore.use.setRole()

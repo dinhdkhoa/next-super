@@ -1,6 +1,6 @@
 'use client'
-import useAuthStore, { useAuthStoreBase } from "@/hooks/zustand/useAuthStore"
-import useStorePersist from "@/hooks/zustand/useStorePersist"
+import useAuthStore, { useAuthStoreBase } from "@/hooks/zustand/use-auth-store"
+import useStorePersist from "@/hooks/zustand/use-store-persist"
 import { socket } from "@/lib/socket"
 import StorageService from "@/lib/storage"
 import { TokenPayload } from "@/types/jwt.types"

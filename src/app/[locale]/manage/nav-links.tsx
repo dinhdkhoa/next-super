@@ -2,8 +2,8 @@
 import menuItems from '@/app/[locale]/manage/menuItems'
 import AppProvider from "@/components/app-provider"
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip'
-import { useAuthStoreBase } from '@/hooks/zustand/useAuthStore'
-import useStorePersist from '@/hooks/zustand/useStorePersist'
+import { useAuthStoreBase } from '@/hooks/zustand/use-auth-store'
+import useStorePersist from '@/hooks/zustand/use-store-persist'
 import { cn } from '@/lib/utils'
 import { Package2, Settings } from 'lucide-react'
 import { Link } from '@/i18n/routing'

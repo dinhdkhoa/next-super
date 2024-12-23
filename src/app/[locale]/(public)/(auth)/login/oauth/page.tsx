@@ -9,7 +9,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { useEffect, useRef } from "react"
 import { TokenPayload } from "@/types/jwt.types"
 import { toast } from "sonner"
-import useAuthStore from "@/hooks/zustand/useAuthStore"
+import useAuthStore from "@/hooks/zustand/use-auth-store"
 
 export default function Page() {
   const searchParams = useSearchParams()

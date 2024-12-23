@@ -4,7 +4,7 @@ import AppProvider from "@/components/app-provider"
 import { Button } from '@/components/ui/button'
 import { checkPathName } from '@/constants/route-middleware'
 import { Role } from '@/constants/type'
-import useAuthStore from "@/hooks/zustand/useAuthStore"
+import useAuthStore from "@/hooks/zustand/use-auth-store"
 import { socket } from '@/lib/socket'
 import { handleApiError } from '@/lib/utils'
 import useLogout, { useLogoutGuest } from '@/queries/useLogout'

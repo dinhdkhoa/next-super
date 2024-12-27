@@ -7,6 +7,7 @@ import NavItems from './nav-items'
 import { Link, routing } from '@/i18n/routing'
 import { notFound } from 'next/navigation'
 import { setRequestLocale } from 'next-intl/server'
+import Footer from '@/components/footer'
 
 export default function Layout({
   children,
@@ -55,6 +56,7 @@ export default function Layout({
         </div>
       </header>
       <main className='flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8'>{children}</main>
+      <Footer />
     </div>
   )
 }

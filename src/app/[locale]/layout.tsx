@@ -59,7 +59,6 @@ export default async function RootLayout({
               disableTransitionOnChange
             >
               {children}
-              <Footer />
               <Toaster richColors />
               <RefreshToken />
               <SocketLogout />

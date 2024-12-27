@@ -4,7 +4,7 @@ import StorageService from "./storage"
 import { RoleType, TokenPayload } from "@/types/jwt.types"
 import jwt from 'jsonwebtoken'
 import { Role } from "@/constants/type"
-import { getCookieValue } from "./utils"
+import { getCookieValueOnClient } from "./utils"
 import { redirect } from "@/i18n/routing"
 import { NextResponse } from "next/server"
 import { defaultLocale } from "@/i18n/i18n"
@@ -124,13 +124,13 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
                 await handleUnthorizedResponseOnClient(baseHeader as any)
             } else {
                 const paramRefreshToken = (options?.headers as any)?.Authorization.split('Bearer ').pop() as string
-                // const { cookies } = await import('next/headers')
-                // const cookieStore = cookies();
-                // const locale = cookieStore.get('NEXT_LOCALE')?.value ?? defaultLocale;
-                // redirect({
-                //     href: `/logout?at=${paramRefreshToken}`,
-                //     locale
-                // })
+                const { cookies } = await import('next/headers')
+                const cookieStore = cookies();
+                const locale = cookieStore.get('NEXT_LOCALE')?.value ?? defaultLocale;
+                redirect({
+                    href: `/logout?at=${paramRefreshToken}`,
+                    locale
+                })
             }
         } else {
             throw new HttpError(data)
@@ -172,7 +172,7 @@ const handleUnthorizedResponseOnClient = async (baseHeader: HeadersInit | undefi
         const accessToken = StorageService.getAccessToken()
         if(accessToken) role = (jwt.decode(accessToken) as TokenPayload).role
         const logoutURL = (accessToken && role == Role.Guest) ? '/api/guest/auth/logout' : '/api/auth/logout'
-        const locale = getCookieValue('NEXT_LOCALE')
+        const locale = getCookieValueOnClient('NEXT_LOCALE')
 
         await fetch(logoutURL, 
             {

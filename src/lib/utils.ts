@@ -200,7 +200,7 @@ export const slugify = (text: string) => {
     .replace(/\-\-+/g, "-")
 } 
 
-export const getCookieValue = (name: string) => {
+export const getCookieValueOnClient = (name: string) => {
   if(!isClient) return
   const regex = new RegExp(`(^| )${name}=([^;]+)`)
   const match = document.cookie.match(regex)

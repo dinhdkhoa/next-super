@@ -12,6 +12,7 @@ import { getLocale, getMessages, setRequestLocale } from 'next-intl/server';
 import { routing } from "@/i18n/routing"
 import { notFound } from "next/navigation"
 import NextTopLoader from 'nextjs-toploader';
+import Footer from "@/components/footer"
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -58,6 +59,7 @@ export default async function RootLayout({
               disableTransitionOnChange
             >
               {children}
+              <Footer />
               <Toaster richColors />
               <RefreshToken />
               <SocketLogout />

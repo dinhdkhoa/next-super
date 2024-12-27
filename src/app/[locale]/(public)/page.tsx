@@ -5,7 +5,7 @@ import Image from 'next/image'
 import {getTranslations} from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 
-const slugifyDish = (name: string, id: number) => `${slugify(name)}-i.${id}`
+export const slugifyDish = (name: string, id: number) => `${slugify(name)}-i.${id}`
 export default async function Home() {
   const t = await getTranslations('HomePage');
   let dishes: DishListResType['data'] = []

@@ -11,6 +11,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getLocale, getMessages, setRequestLocale } from 'next-intl/server';
 import { routing } from "@/i18n/routing"
 import { notFound } from "next/navigation"
+import NextTopLoader from 'nextjs-toploader';
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -47,6 +48,7 @@ export default async function RootLayout({
           fontSans.variable
         )}
       >
+        <NextTopLoader showSpinner={false} color="hsl(var(--foreground))" crawlSpeed={200} speed={200}/>
         <NextIntlClientProvider messages={messages}>
           <AppProvider>
             <ThemeProvider

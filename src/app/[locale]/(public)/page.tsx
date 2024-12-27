@@ -1,12 +1,12 @@
 import dishesAPI from '@/apiRequests/dishes'
-import { formatCurrency, handleApiError, slugify } from '@/lib/utils'
+import { formatCurrency, handleApiError, slugify, slugifyDish } from '@/lib/utils'
 import { DishListResType, DishResType } from '@/schemaValidations/dish.schema'
 import Image from 'next/image'
-import {getTranslations} from 'next-intl/server';
+import {getTranslations, setRequestLocale} from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 
-export const slugifyDish = (name: string, id: number) => `${slugify(name)}-i.${id}`
-export default async function Home() {
+export default async function Home({params: {locale}} : {params: {locale: string}}) {
+  setRequestLocale(locale);
   const t = await getTranslations('HomePage');
   let dishes: DishListResType['data'] = []
   try {

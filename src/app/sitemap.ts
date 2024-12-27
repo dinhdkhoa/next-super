@@ -1,8 +1,8 @@
 import dishesAPI from "@/apiRequests/dishes"
 import envConfig from "@/config"
 import { locales } from "@/i18n/i18n"
+import { slugifyDish } from "@/lib/utils"
 import type { MetadataRoute } from "next"
-import { slugifyDish } from "./[locale]/(public)/page"
 
 const staticRoutes: MetadataRoute.Sitemap = [
   {

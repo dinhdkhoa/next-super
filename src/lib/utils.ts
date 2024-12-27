@@ -198,4 +198,15 @@ export const slugify = (text: string) => {
     .replace(/\s+/g, "-")
     .replace(/[^\w\-]+/g, "")
     .replace(/\-\-+/g, "-")
-} //todo: Add slug to home page
+} 
+
+export const getCookieValue = (name: string) => {
+  if(!isClient) return
+  const regex = new RegExp(`(^| )${name}=([^;]+)`)
+  const match = document.cookie.match(regex)
+  if (match) {
+    return match[2]
+  }
+}
+
+export const slugifyDish = (name: string, id: number) => `${slugify(name)}-i.${id}`

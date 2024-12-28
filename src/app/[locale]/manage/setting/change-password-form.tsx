@@ -13,10 +13,11 @@ import accountAPI from '@/apiRequests/account'
 import { handleApiError } from '@/lib/utils'
 import { toast } from 'sonner'
 import { FormEvent } from 'react'
+import StorageService from '@/lib/storage'
 
 export default function ChangePasswordForm() {
   const changePass = useMutation(
-    {mutationFn: accountAPI.changePW}
+    {mutationFn: accountAPI.changePWv2}
   )
   const form = useForm<ChangePasswordBodyType>({
     resolver: zodResolver(ChangePasswordBody),
@@ -27,18 +28,20 @@ export default function ChangePasswordForm() {
     }
   })
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const onSubmit = form.handleSubmit(async (data) => {
     if (changePass.isPending) return
     try {
-      const changePWRes = await changePass.mutateAsync(form.getValues())
+      const changePWRes = await changePass.mutateAsync(data)
+      const {payload: {data : {accessToken, refreshToken}}} = changePWRes
+      StorageService.setAccessToken(accessToken)
+      StorageService.setRefreshToken(refreshToken)
       toast.success(changePWRes.payload.message)
     
       form.reset()
     } catch (error) {
       handleApiError(error, form.setError)
     }
-  }
+  })
 
   const handleDelete = () => {
     const promise = () =>
@@ -72,7 +75,7 @@ export default function ChangePasswordForm() {
       <form
         noValidate
         className="grid auto-rows-max items-start gap-4 md:gap-8"
-        onSubmit={handleSubmit}
+        onSubmit={onSubmit}
         // onReset={e => {form.reset()}}
         onReset={e => {      toast.success('changePWRes.payload.message')
 }}
@@ -147,7 +150,7 @@ export default function ChangePasswordForm() {
                 <Button variant="outline" size="sm" onClick={confirm}>
                   Toast
                 </Button>
-                <Button size="sm">Lưu thông tin</Button>
+                <Button size="sm" type='submit'>Lưu thông tin</Button>
               </div>
             </div>
           </CardContent>

@@ -43,7 +43,8 @@ export default async function Home({params: {locale}} : {params: {locale: string
                     src={dish.image}
                     alt={dish.description}
                     width={150}
-                    quality={100}
+                    quality={50}
+                    loading='lazy'
                     height={150}
                     className='object-cover w-[150px] h-[150px] rounded-md'
                   />

@@ -197,9 +197,10 @@ export const slugify = (text: string) => {
     .toLowerCase()
     .trim()
     .replace(/\s+/g, "-")
-    .replace(/[^\w\-]+/g, "")
-    .replace(/\-\-+/g, "-")
-} 
+    .replace(/[^a-z0-9\u00C0-\u024F\u1E00-\u1EFF\u0102\u0103\u01A0\u01A1\u01AF\u01B0\u1EA0-\u1EF9\-]+/g, "")
+    .replace(/\-\-+/g, "-");
+};
+
 
 export const getCookieValueOnClient = (name: string) => {
   if(!isClient) return

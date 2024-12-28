@@ -1,4 +1,4 @@
-import { Home, LineChart, ShoppingCart, Users2, Salad, Table } from 'lucide-react'
+import { Home, HopIcon, ShoppingCart, Users2, Salad, Table } from 'lucide-react'
 
 const menuItems = [
   {
@@ -30,9 +30,14 @@ const menuItems = [
   {
     title: 'Nhân viên',
     Icon: Users2,
-    href: '/',
+    href: '/manage/accounts',
     isOwner: true
-  }
+  },
+  {
+    title: 'Menu Page',
+    Icon: HopIcon,
+    href: '/',
+  },
 ]
 
 export default menuItems

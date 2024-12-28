@@ -21,7 +21,8 @@ async function DishDetailPublicPage({ params: { slug } }: { params: { slug: stri
                 alt={dish.name}
                 height={700}
                 width={700}
-                quality={100}
+                quality={50}
+                loading='lazy'
                 className={cn('object-cover w-full h-full max-w-3xl max-h-3xl')}
             />
             <p className='text-lg'>{dish.description}</p>

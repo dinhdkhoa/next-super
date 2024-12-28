@@ -12,6 +12,7 @@ import { TokenPayload } from "@/types/jwt.types"
 import guestAPI from "@/apiRequests/guest"
 import { BookX, CookingPot, HandCoins, Loader, Truck } from "lucide-react"
 import { format } from "date-fns"
+import { defaultLocale } from "@/i18n/i18n"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -186,7 +187,7 @@ export const getTableLink = ({
   tableNumber: number
 }) => {
   return (
-    envConfig.NEXT_PUBLIC_URL + "/tables/" + tableNumber + "?token=" + token
+    envConfig.NEXT_PUBLIC_URL + `/${defaultLocale}` + "/tables/" + tableNumber + "?token=" + token
   )
 }
 

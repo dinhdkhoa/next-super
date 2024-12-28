@@ -1,20 +1,20 @@
 'use client'
-import AppProvider from "@/components/app-provider"
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Form, FormField, FormItem, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import useAuthStore from "@/hooks/zustand/use-auth-store"
+import { socket } from '@/lib/socket'
 import { handleApiError } from '@/lib/utils'
 import { GuestLoginBody, GuestLoginBodyType } from '@/schemaValidations/guest.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { useGuestLoginMutation } from './queries/useGuestAuthQueries'
-import { useEffect } from 'react'
-import { socket } from '@/lib/socket'
-import useAuthStore from "@/hooks/zustand/use-auth-store"
+import { useRouter } from '@/i18n/routing'
 
 export default function GuestLoginForm() {
   const setRole = useAuthStore.use.setRole()

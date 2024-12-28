@@ -1,7 +1,13 @@
 import { setRequestLocale } from 'next-intl/server';
 import LoginForm from './login-form';
 
-export default function Login({params: {locale}} : {params: {locale: string}}) {
+export default async function Login(props: {params: Promise<{locale: string}>}) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   setRequestLocale(locale);
 
   return (

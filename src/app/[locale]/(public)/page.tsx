@@ -5,7 +5,13 @@ import Image from 'next/image'
 import {getTranslations, setRequestLocale} from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 
-export default async function Home({params: {locale}} : {params: {locale: string}}) {
+export default async function Home(props: {params: Promise<{locale: string}>}) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
   setRequestLocale(locale);
   const t = await getTranslations('HomePage');
   let dishes: DishListResType['data'] = []

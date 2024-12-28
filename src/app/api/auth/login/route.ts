@@ -11,7 +11,7 @@ interface AppRequest<T = any> extends Request {
 
 export async function POST(request: AppRequest<LoginBodyType>) {
     const body = await request.json()
-    const nextCookies = cookies()
+    const nextCookies = await cookies()
     try {
         const loginRes = await authAPI.loginServer(body)
         const {payload} = loginRes

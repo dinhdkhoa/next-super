@@ -11,7 +11,7 @@ interface AppRequest<T = any> extends Request {
 
 
 export async function POST() {
-    const nextCookies = cookies()
+    const nextCookies = await cookies()
     const refreshToken = nextCookies.get('refreshToken')?.value 
     if ( !refreshToken) {
         return Response.json({

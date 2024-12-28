@@ -13,7 +13,7 @@ interface AppRequest<T = any> extends Request {
 
 export async function PUT(request: AppRequest<ChangePasswordV2BodyType>) {
     const body = await request.json()
-    const nextCookies = cookies()
+    const nextCookies = await cookies()
     const accessTokenFromCookie = nextCookies.get('accessToken')?.value
 
     if ( !accessTokenFromCookie) {

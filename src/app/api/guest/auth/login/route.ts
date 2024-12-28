@@ -13,7 +13,7 @@ interface AppRequest<T = any> extends Request {
 
 export async function POST(request: AppRequest<GuestLoginBodyType>) {
     const body = await request.json()
-    const nextCookies = cookies()
+    const nextCookies = await cookies()
     try {
         const loginRes = await guestAPI.loginServer(body)
         const {payload} = loginRes

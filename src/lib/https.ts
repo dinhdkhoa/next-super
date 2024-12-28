@@ -6,7 +6,6 @@ import jwt from 'jsonwebtoken'
 import { Role } from "@/constants/type"
 import { getCookieValueOnClient } from "./utils"
 import { redirect } from "@/i18n/routing"
-import { NextResponse } from "next/server"
 import { defaultLocale } from "@/i18n/i18n"
 
 type CustomRequest = RequestInit & { baseUrl?: string | undefined }
@@ -125,7 +124,7 @@ const request = async <ResponseType>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
             } else {
                 const paramRefreshToken = (options?.headers as any)?.Authorization.split('Bearer ').pop() as string
                 const { cookies } = await import('next/headers')
-                const cookieStore = cookies();
+                const cookieStore = await cookies();
                 const locale = cookieStore.get('NEXT_LOCALE')?.value ?? defaultLocale;
                 redirect({
                     href: `/logout?at=${paramRefreshToken}`,

@@ -7,7 +7,13 @@ const unslugifyDish = (slug: string) => {
     const [name, id] = slug.split('-i.');
     return { name, id: parseInt(id) };
 }
-async function DishDetailPublicPage({ params: { slug } }: { params: { slug: string } }) {
+async function DishDetailPublicPage(props: { params: Promise<{ slug: string }> }) {
+    const params = await props.params;
+
+    const {
+        slug
+    } = params;
+
     const {id} = unslugifyDish(slug)
     const data = await dishesAPI.getDishDetail(Number(id))
     //To do : error handling for non-exist dish id

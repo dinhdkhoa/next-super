@@ -9,17 +9,26 @@ import { notFound } from 'next/navigation'
 import { setRequestLocale } from 'next-intl/server'
 import Footer from '@/components/footer'
 
-export default function Layout({
-  children,
-  params: {locale}
-}: Readonly<{
-  children: React.ReactNode,
-  params: {locale: string}
-}>) {
+export default async function Layout(
+  props: Readonly<{
+    children: React.ReactNode,
+    params: {locale: string}
+  }>
+) {
+  const params = await props.params;
+
+  const {
+    locale
+  } = params;
+
+  const {
+    children
+  } = props;
+
   if (!routing.locales.includes(locale as any)) {
     notFound();
   }
- 
+
   // Enable static rendering
   setRequestLocale(locale);
   return (

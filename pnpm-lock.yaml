@@ -148,7 +148,7 @@ importers:
         specifier: ^9.0.7
         version: 9.0.7
       '@types/node':
-        specifier: ^22
+        specifier: ^22.10.2
         version: 22.10.2
       '@types/qrcode':
         specifier: ^1.5.5

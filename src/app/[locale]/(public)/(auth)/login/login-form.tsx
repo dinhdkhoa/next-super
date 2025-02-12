@@ -24,14 +24,14 @@ import OauthGoogleBtn from './oauth-google-btn'
 export default function LoginForm() {
   const router = useRouter()
   // const params = useSearchParams()
-  const {params, onParamsReceived} = useSeachParamsLoader()
+  const { params, onParamsReceived } = useSeachParamsLoader()
   const refreshToken = params?.get("rt")
   const returnUrl = params?.get("returnUrl")
   const setRole = useAuthStore.use.setRole()
   const t = useTranslations('LoginPage')
 
   useEffect(() => {
-    if(refreshToken == 'expired'){
+    if (refreshToken == 'expired') {
       setRole()
     }
   }, [refreshToken, setRole])
@@ -41,8 +41,8 @@ export default function LoginForm() {
       mutationFn: authAPI.loginClient,
       onSuccess: (data) => {
         toast.success(data.payload.message)
-        setRole(data.payload.data.account.role)
-        router.push(returnUrl ??'/manage/dashboard')
+        setRole('Owner')
+        router.push(returnUrl ?? '/manage/dashboard')
         socket.connect()
       },
       onError(error, variables, context) {
@@ -59,13 +59,13 @@ export default function LoginForm() {
   })
 
   const onSubmit = (data: LoginBodyType) => {
-    if(loginMutation.isPending) return 
+    if (loginMutation.isPending) return
     loginMutation.mutate(data)
   }
 
   return (
     <Card className="mx-auto max-w-sm">
-      <SearchParamsLoader onParamsReceived={onParamsReceived}/>
+      <SearchParamsLoader onParamsReceived={onParamsReceived} />
       <CardHeader>
         <CardTitle className="text-2xl">{t('title')}</CardTitle>
         <CardDescription>
@@ -74,60 +74,60 @@ export default function LoginForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-        <fieldset className='group' disabled={loginMutation.isPending || loginMutation.isSuccess}>
-          <form
-            className="space-y-2 max-w-[600px] flex-shrink-0 w-full"
-            noValidate
-            onSubmit={form.handleSubmit(onSubmit)}
-          >
-            <div className="grid gap-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="grid gap-2">
-                      <Label htmlFor="email">{t('email-field-title')}</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="m@example.com"
-                        required
-                        {...field}
-                      />
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="grid gap-2">
-                      <div className="flex items-center">
-                        <Label htmlFor="password">{t('password-field-title')}</Label>
+          <fieldset className='group' disabled={loginMutation.isPending || loginMutation.isSuccess}>
+            <form
+              className="space-y-2 max-w-[600px] flex-shrink-0 w-full"
+              noValidate
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <div className="grid gap-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="grid gap-2">
+                        <Label htmlFor="email">{t('email-field-title')}</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="m@example.com"
+                          required
+                          {...field}
+                        />
+                        <FormMessage />
                       </div>
-                      <Input
-                        id="password"
-                        type="password"
-                        required
-                        {...field}
-                        autoFocus
-                      />
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full">
-              {t('login-button')}
-              </Button>
-              <OauthGoogleBtn />
-            </div>
-          </form>
-        </fieldset>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="grid gap-2">
+                        <div className="flex items-center">
+                          <Label htmlFor="password">{t('password-field-title')}</Label>
+                        </div>
+                        <Input
+                          id="password"
+                          type="password"
+                          required
+                          {...field}
+                          autoFocus
+                        />
+                        <FormMessage />
+                      </div>
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" className="w-full">
+                  {t('login-button')}
+                </Button>
+                <OauthGoogleBtn />
+              </div>
+            </form>
+          </fieldset>
         </Form>
       </CardContent>
     </Card>

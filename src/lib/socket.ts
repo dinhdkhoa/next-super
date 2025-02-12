@@ -2,6 +2,7 @@ import { io, Socket } from "socket.io-client"
 import envConfig from "@/config"
 import StorageService from "./storage"
 import { SocketEventListener } from "@/constants/socket"
+import jwt from "jsonwebtoken"
 
 // "undefined" means the URL will be computed from the `window.location` object
 
@@ -10,13 +11,21 @@ import { SocketEventListener } from "@/constants/socket"
 //     Authorization: `Bearer ${StorageService.getAccessToken()}`
 //   }
 // })
-type SocketEventListener = typeof SocketEventListener[keyof typeof SocketEventListener];
+type SocketEventListener =
+  (typeof SocketEventListener)[keyof typeof SocketEventListener]
+
+class SocketClient {
+  public socketInstance: Socket | null = null
+}
+
+const socketClient = new SocketClient()
 class WebSocket {
   private socket: Socket | null = null
-  public isConnected : boolean = false
+  public isConnected: boolean = false
 
   connect() {
     const accessToken = StorageService.getAccessToken()
+    const decodedAT = jwt.decode(accessToken!) as { userId: string }
     if (!accessToken) {
       console.error("Don't have any access token to establish socket")
       return
@@ -24,7 +33,8 @@ class WebSocket {
     if (!this.socket) {
       this.socket = io(envConfig.NEXT_PUBLIC_API_ENDPOINT, {
         auth: {
-          Authorization: `Bearer ${accessToken}`
+          Authorization: `Bearer ${accessToken}`,
+          _id: decodedAT.userId
         },
         reconnection: true, // Enable reconnection
         reconnectionAttempts: 5, // Max number of reconnection attempts before giving up
@@ -39,7 +49,7 @@ class WebSocket {
       })
 
       this.socket.on(SocketEventListener.Disconnect, () => {
-        this.isConnected = false  
+        this.isConnected = false
         console.log("WebSocket disconnected")
       })
     }
@@ -55,10 +65,15 @@ class WebSocket {
 
   disconnect() {
     if (this.socket) {
-      this.isConnected = false  
+      this.isConnected = false
       this.socket.disconnect()
       this.socket = null
     }
+  }
+
+  get client() {
+    if (!this.isConnected) throw new Error("No Socket Connection")
+    return this.socket as Socket
   }
 }
 export const socket = new WebSocket()

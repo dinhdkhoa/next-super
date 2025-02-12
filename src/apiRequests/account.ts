@@ -17,7 +17,7 @@ import { LoginBodyType, LoginResType } from "@/schemaValidations/auth.schema"
 import queryString from "query-string"
 
 const accountAPI = {
-  getAccount: () => http.get<AccountResType>("accounts/me"),
+  getAccount: () => http.get<AccountResType>("users/me"),
   updateAccount: (body: UpdateMeBodyType) =>
     http.put<AccountResType>("accounts/me", body),
   changePW: (body: ChangePasswordBodyType) =>

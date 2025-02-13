@@ -5,31 +5,32 @@ import useUserProfile from '@/hooks/zustand/use-user-profile';
 import { socket } from '@/lib/socket';
 import { Button } from '@/components/ui/button';
 import { SocketEventListener } from '@/constants/socket';
-import { toast } from 'sonner';
+import { useQuery } from '@tanstack/react-query';
+import conversationAPI from '@/apiRequests/conversation';
+
+interface Conversation {
+    content: string,
+    receiver_id: string,
+    sender_id: string,
+    _id?: string
+}
 
 const ChatBox = () => {
-    const [messages, setMessages] = useState([
-        { id: 1, text: "Hello! How can I help you today?", sender: "reply" },
-        { id: 2, text: "Hi! I have a question.", sender: "user" },
-        { id: 3, text: "Hello!?", sender: "reply" },
-    ]);
+    const [conversations, setConversations] = useState<Conversation[]>([]);
 
     //@ts-ignore
     const { profile } = useUserProfile()
-    const [user, setUser] = useState<string>('')
+    const [receiverId, setReceiverId] = useState<string>('')
     useEffect(() => {
-        if (profile && profile._id) setUser(profile._id == '67a4fd97e57cecea777ed3c3' ? '67a4fd97e57cecea777ed3bb' : '67a4fd97e57cecea777ed3c3')
+        if (profile && profile._id) setReceiverId(profile._id == '67a4fd97e57cecea777ed3c3' ? '67a4fd97e57cecea777ed3bb' : '67a4fd97e57cecea777ed3c3')
 
     }, [profile])
     const [newMessage, setNewMessage] = useState("");
 
     useEffect(() => {
         socket.connect()
-        function onReceivingReply(data: {
-            from: string,
-            payload: string
-        }) {
-            setMessages(prev => [...prev, { id: prev.length + 1, text: data.payload, sender: "reply" }])
+        function onReceivingReply(data: Conversation) {
+            setConversations(prev => [...prev, data])
         }
 
         socket.on(SocketEventListener.receivePrivateMessage, onReceivingReply);
@@ -39,22 +40,37 @@ const ChatBox = () => {
         };
     }, []);
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        if (newMessage.trim()) {
-            setMessages(prev => [...prev, { id: prev.length + 1, text: newMessage, sender: "user" }]);
-            setNewMessage("");
+    const { data } = useQuery({
+        queryKey: ['getConversation', profile],
+        queryFn: () => conversationAPI.getConversation({ receiverId }),
+        enabled: Boolean(profile) && Boolean(receiverId)
+    })
+
+    useEffect(() => {
+        if (data && data?.payload && (data.payload as any).result.conversations.length > 0) {
+            const { conversations } = (data.payload as any).result
+            setConversations(conversations)
         }
+    }, [data]);
+
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+        if (!(profile && profile._id)) return
+        e.preventDefault();
+        if (!newMessage.trim()) return
+
+        const newConvo: Conversation = {
+            content: newMessage,
+            receiver_id: receiverId, sender_id: profile._id
+        }
+        setConversations(prev => [...prev, { ...newConvo, _id: new Date().getTime().toString(), }]);
+        setNewMessage("");
         const ws = socket.client
-        toast.info(user)
-        ws.emit('send private message', {
-            payload: newMessage,
-            to: user
-        })
+        ws.emit('send_private_message', newConvo)
 
     };
 
     const isSubmitDisabled = newMessage == ''
+    const isSender = (id: string) => (profile && profile._id) && id == profile._id
 
     return (
         <div className="flex flex-col h-screen max-w-2xl mx-auto p-4">
@@ -65,18 +81,18 @@ const ChatBox = () => {
 
             {/* Messages container */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {messages.map((message) => (
+                {conversations.map((conversation) => (
                     <div
-                        key={message.id}
-                        className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                        key={conversation._id}
+                        className={`flex ${isSender(conversation.sender_id) ? 'justify-end' : 'justify-start'}`}
                     >
                         <div
-                            className={`max-w-[70%] rounded-lg p-3 ${message.sender === 'user'
+                            className={`max-w-[70%] rounded-lg p-3 ${isSender(conversation.sender_id)
                                 ? 'bg-blue-500 text-white'
                                 : 'bg-gray-200 text-gray-800'
                                 }`}
                         >
-                            {message.text}
+                            {conversation.content}
                         </div>
                     </div>
                 ))}

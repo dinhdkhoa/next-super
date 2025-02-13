@@ -15,12 +15,10 @@ export default function SocketChat() {
     const { setProfile } = useUserProfile()
     const handleClick = () => {
         const ws = socket.client
-        toast.info(JSON.stringify(ws.id))
         ws.emit('hello', 'hello from nextjs')
     }
     useEffect(() => {
         if (data && data.payload.data) {
-            toast.info(JSON.stringify(data.payload.data))
             setProfile(data.payload.data)
         }
     }, [data])

@@ -6,5 +6,5 @@ export const SocketEventListener = {
   Payment: "payment",
   RefreshToken: "refresh-token",
   Logout: "logout",
-  receivePrivateMessage: "reply private message"
+  receivePrivateMessage: "reply_private_message"
 } as const

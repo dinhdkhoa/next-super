@@ -14,13 +14,12 @@ import { socket } from '@/lib/socket'
 import { handleApiError } from '@/lib/utils'
 import useGetAccount from '@/queries/useGetAccount'
 import useLogout from '@/queries/useLogout'
-import { Link } from '@/i18n/routing'
-import { useRouter } from 'next/navigation'
+import { Link, useRouter } from '@/i18n/routing'
 
 
 export default function DropdownAvatar() {
   const router = useRouter()
-  const {data} = useGetAccount()
+  const { data } = useGetAccount()
   const setRole = useAuthStore.use.setRole()
 
   const account = data?.payload.data
@@ -28,14 +27,14 @@ export default function DropdownAvatar() {
   const logoutMutation = useLogout()
 
   const handleLogout = async () => {
-    if(logoutMutation.isPending) return 
+    if (logoutMutation.isPending) return
 
     try {
       await logoutMutation.mutate(null as any, {
         onSuccess(data, variables, context) {
-           router.push("/login")
-           setRole()
-           socket.disconnect()
+          router.push("/login")
+          setRole()
+          socket.disconnect()
         },
       })
     } catch (error) {

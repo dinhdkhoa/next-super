@@ -1,12 +1,13 @@
 'use client'
-import React, { FormEvent, useEffect, useState } from 'react';
+import React, { FormEvent, useEffect, useRef, useState } from 'react';
 import { Send } from 'lucide-react';
 import useUserProfile from '@/hooks/zustand/use-user-profile';
 import { socket } from '@/lib/socket';
 import { Button } from '@/components/ui/button';
 import { SocketEventListener } from '@/constants/socket';
-import { useQuery } from '@tanstack/react-query';
-import conversationAPI from '@/apiRequests/conversation';
+import { DefaultError, InfiniteData, QueryKey, useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import conversationAPI, { GetConversationRes } from '@/apiRequests/conversation';
+import { useInView } from 'react-intersection-observer';
 
 interface Conversation {
     content: string,
@@ -33,23 +34,76 @@ const ChatBox = () => {
             setConversations(prev => [...prev, data])
         }
 
-        socket.on(SocketEventListener.receivePrivateMessage, onReceivingReply);
+        socket.on(SocketEventListener.ReceivePrivateMessage, onReceivingReply);
 
         return () => {
-            socket.off(SocketEventListener.receivePrivateMessage, onReceivingReply);
+            socket.off(SocketEventListener.ReceivePrivateMessage, onReceivingReply);
         };
     }, []);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+    const { ref: messageStartRef, inView } = useInView()
 
-    const { data } = useQuery({
-        queryKey: ['getConversation', profile],
-        queryFn: () => conversationAPI.getConversation({ receiverId }),
-        enabled: Boolean(profile) && Boolean(receiverId)
+    const scrollToBottom = () => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    // const { data } = useQuery({
+    //     queryKey: ['getConversation', profile],
+    //     queryFn: () => conversationAPI.getConversation({ receiverId }),
+    //     enabled: Boolean(profile) && Boolean(receiverId)
+    // })
+
+    const {
+        status,
+        data,
+        error,
+        isFetching,
+        isFetchingNextPage,
+        isFetchingPreviousPage,
+        fetchNextPage,
+        fetchPreviousPage,
+        hasNextPage,
+        hasPreviousPage,
+        isFetched
+
+    } = useInfiniteQuery<{
+        status: number;
+        payload: GetConversationRes;
+    }, DefaultError, InfiniteData<{
+        status: number;
+        payload: GetConversationRes;
+    }>, QueryKey, {
+        limit?: number
+        page?: number
+        receiverId: string
+    }>({
+        enabled: Boolean(profile) && Boolean(receiverId.trim()),
+        queryKey: ['getConversation'],
+        queryFn: async ({ pageParam }) => await conversationAPI.getConversation(pageParam!),
+        initialPageParam: { limit: 10, receiverId, page: 1 },
+        getPreviousPageParam: (firstPage) => {
+            return firstPage.payload.result.page > 1 ? { page: firstPage.payload.result.page - 1, receiverId } : undefined;
+        },
+        getNextPageParam: (lastPage) => {
+            return lastPage.payload.result.page < lastPage.payload.result.total_page ? { page: lastPage.payload.result.page + 1, receiverId } : undefined;
+        },
     })
 
     useEffect(() => {
-        if (data && data?.payload && (data.payload as any).result.conversations.length > 0) {
-            const { conversations } = (data.payload as any).result
-            setConversations(conversations)
+        if (inView && !isFetching && Boolean(profile) && Boolean(receiverId.trim())) {
+            fetchNextPage()
+        }
+    }, [fetchNextPage, inView])
+
+
+    useEffect(() => {
+        if (data && data?.pages && data.pages[(data.pages.length - 1)].payload.result.conversations.length > 0) {
+            setConversations(prev => [...data.pages[(data.pages.length - 1)].payload.result.conversations, ...prev]);
+            if (data.pages.length == 1) {
+                setTimeout(() => {
+                    scrollToBottom()
+                }, 0);
+            }
         }
     }, [data]);
 
@@ -66,6 +120,7 @@ const ChatBox = () => {
         setNewMessage("");
         const ws = socket.client
         ws.emit('send_private_message', newConvo)
+        scrollToBottom()
 
     };
 
@@ -80,7 +135,18 @@ const ChatBox = () => {
             </div>
 
             {/* Messages container */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 flex-col">
+                <div ref={messageStartRef} />
+                {isFetchingNextPage && <>
+                    <div className='text-white text-center w-full'>
+                        <span>Loading ...</span>
+                    </div>
+                </>}
+                {!hasNextPage && isFetched && <>
+                    <div className='text-white text-center w-full'>
+                        <span>End of Conversation</span>
+                    </div>
+                </>}
                 {conversations.map((conversation) => (
                     <div
                         key={conversation._id}
@@ -96,6 +162,7 @@ const ChatBox = () => {
                         </div>
                     </div>
                 ))}
+                <div ref={messagesEndRef} />
             </div>
 
             {/* Message input */}

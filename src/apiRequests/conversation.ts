@@ -7,11 +7,13 @@ export interface Conversation {
   _id: string
 }
 
-interface GetConversationRes {
-  limit: number
-  page: number
-  total_page: number
-  conversations: Conversation[]
+export interface GetConversationRes {
+  result: {
+    limit: number
+    page: number
+    total_page: number
+    conversations: Conversation[]
+  }
 }
 
 const conversationAPI = {
@@ -28,7 +30,10 @@ const conversationAPI = {
       limit,
       page
     })
-    return http.get<GetConversationRes>(url)
+    const a = http.get<GetConversationRes>(url)
+    return new Promise<typeof a>((resolve) => {
+      resolve(a)
+    })
   }
 }
 

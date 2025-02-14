@@ -25,7 +25,6 @@ class WebSocket {
 
   connect() {
     const accessToken = StorageService.getAccessToken()
-    const decodedAT = jwt.decode(accessToken!) as { userId: string }
     if (!accessToken) {
       console.error("Don't have any access token to establish socket")
       return
@@ -33,8 +32,7 @@ class WebSocket {
     if (!this.socket) {
       this.socket = io(envConfig.NEXT_PUBLIC_API_ENDPOINT, {
         auth: {
-          Authorization: `Bearer ${accessToken}`,
-          _id: decodedAT.userId
+          Authorization: `Bearer ${accessToken}`
         },
         reconnection: true, // Enable reconnection
         reconnectionAttempts: 5, // Max number of reconnection attempts before giving up
